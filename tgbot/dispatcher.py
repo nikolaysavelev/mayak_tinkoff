@@ -33,17 +33,24 @@ def setup_dispatcher(dp):
     # onboarding
     dp.add_handler(CommandHandler("start", onboarding_handlers.command_start))
 
+    dp.add_handler(CommandHandler("strategy", admin_handlers.strategy))
+    dp.add_handler(CommandHandler("str_info", admin_handlers.str_info))
+    dp.add_handler(CommandHandler("stock", admin_handlers.stock))
+    dp.add_handler(CommandHandler("time", admin_handlers.time))
+    dp.add_handler(CommandHandler("feedback", admin_handlers.feedback))
+    dp.add_handler(CommandHandler("off", admin_handlers.off))
+
     # admin commands
-    dp.add_handler(CommandHandler("admin", admin_handlers.admin))
-    dp.add_handler(CommandHandler("stats", admin_handlers.stats))
-    dp.add_handler(CommandHandler('export_users', admin_handlers.export_users))
+    #dp.add_handler(CommandHandler("admin", admin_handlers.admin))
+    #dp.add_handler(CommandHandler("stats", admin_handlers.stats))
+    #dp.add_handler(CommandHandler('export_users', admin_handlers.export_users))
 
     # location
-    dp.add_handler(CommandHandler("ask_location", location_handlers.ask_for_location))
-    dp.add_handler(MessageHandler(Filters.location, location_handlers.location_handler))
+    #dp.add_handler(CommandHandler("ask_location", location_handlers.ask_for_location))
+    #dp.add_handler(MessageHandler(Filters.location, location_handlers.location_handler))
 
     # secret level
-    dp.add_handler(CallbackQueryHandler(onboarding_handlers.secret_level, pattern=f"^{SECRET_LEVEL_BUTTON}"))
+    #dp.add_handler(CallbackQueryHandler(onboarding_handlers.secret_level, pattern=f"^{SECRET_LEVEL_BUTTON}"))
 
 
     # broadcast message
@@ -114,20 +121,12 @@ def process_telegram_event(update_json):
 def set_up_commands(bot_instance: Bot) -> None:
     langs_with_commands: Dict[str, Dict[str, str]] = {
         'ru': {
-            'start': 'Запустить бота 🚀',
-            'stats': 'Статистика бота 📊',
-            'admin': 'Показать информацию для админов ℹ️',
-            'broadcast': 'Информация для админов ℹ️',
-            'ask_location': 'Информация для админов ℹ️',
-            'export_users': 'Информация для админов ℹ️',
-        },
-        'en': {
-            'start': 'Start django bot 🚀',
-            'stats': 'Statistics of bot 📊',
-            'admin': 'Show admin info ℹ️',
-            'ask_location': 'Send location 📍',
-            'broadcast': 'Broadcast message 📨',
-            'export_users': 'Export users.csv 👥',
+            'strategy': 'Выбрать другую стратегию',
+            'str_info': 'Узнать о стратегиях больше️',
+            'stock': 'Изменить набор бумаг️',
+            'time': 'Настроить удобное время уведомлений',
+            'off': 'Выключить сигналы',
+            'feedback': 'Оставить фидбэк'
         }
     }
 

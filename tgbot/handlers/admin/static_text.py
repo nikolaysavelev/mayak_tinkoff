@@ -1,8 +1,4 @@
-command_start = '/stats'
-only_for_admins = 'Sorry, this function is available only for admins. Set "admin" flag in django admin panel.'
+telegraph_1 = '<a href="https://telegra.ph/Strategiya-Srednee-skolzyashchee-SMA-05-05"><b>SMA</b></a>'
+telegraph_2 = '<a href="https://telegra.ph/Strategiya-Pereprodannost-po-RSI-05-05"><b>RSI</b></a>'
 
-secret_admin_commands = f"⚠️ Secret Admin commands\n" \
-                        f"{command_start} - bot stats"
-
-users_amount_stat = "<b>Users</b>: {user_count}\n" \
-                    "<b>24h active</b>: {active_24}"
+ask_feedback = 'Ваше мнение очень важно для нас. Будем рады критике и пожеланиям'
