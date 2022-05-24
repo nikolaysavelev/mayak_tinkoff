@@ -7,6 +7,7 @@ from telegram.ext import CallbackContext
 from tgbot.handlers.admin import static_text
 from tgbot.handlers.admin.utils import _get_csv_from_qs_values
 from tgbot.models import User
+from tgbot.handlers.admin.keyboards import feedback_buttons
 
 def admin(update: Update, context: CallbackContext) -> None:
     """ Show help info about all secret admins commands """
@@ -36,13 +37,15 @@ def stock(update: Update, context: CallbackContext) -> None:
 
 def time(update: Update, context: CallbackContext) -> None:
     """ Edit time for user """
+    u = User.get_user(update, context)
+    update.message.reply_text(static_text.time_settings)
     # TODO edit time for user and add to db
 
 
 def feedback(update: Update, context: CallbackContext) -> None:
     """ feedback """
     u = User.get_user(update, context)
-    update.message.reply_text(static_text.ask_feedback)
+    update.message.reply_text(text=static_text.ask_feedback, reply_markup=feedback_buttons())
     ##
     print(update.message.text)
     # TODO save in the heart and db
