@@ -26,7 +26,7 @@ def send_stacktrace_to_tg_chat(update: Update, context: CallbackContext) -> None
     )
 
     user_message = """
-Извини, что-то сломалось в боте. Нам очень грустно, обязательно напиши сюда! @nikolaysavelev"
+Сервис временно недоступен. Обязательно напишите нам /feedback"
 """
     context.bot.send_message(
         chat_id=u.user_id,

@@ -11,8 +11,8 @@ def feedback_buttons() -> InlineKeyboardMarkup:
 
 
 def strategy_buttons() -> InlineKeyboardMarkup:
-    buttons = [[InlineKeyboardButton('Скользящее среднее (SMA)', callback_data='rsi'),
-                InlineKeyboardButton('Перепроданность по RSI', callback_data='sma')]]
+    buttons = [[InlineKeyboardButton('Скользящее среднее (SMA)', callback_data='sma')],
+               [InlineKeyboardButton('Перепроданность по RSI', callback_data='rsi')]]
 
     return InlineKeyboardMarkup(buttons)
 
