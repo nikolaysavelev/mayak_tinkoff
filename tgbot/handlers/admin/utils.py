@@ -5,7 +5,6 @@ from datetime import datetime
 from django.db.models import QuerySet
 from typing import Dict
 
-
 def _get_csv_from_qs_values(queryset: QuerySet[Dict], filename: str = 'users'):
     keys = queryset[0].keys()
 

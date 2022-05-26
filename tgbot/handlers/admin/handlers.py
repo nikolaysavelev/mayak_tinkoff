@@ -5,7 +5,7 @@ from telegram import ParseMode, Update
 from telegram.ext import CallbackContext
 
 from tgbot.handlers.admin import static_text
-from tgbot.handlers.admin.keyboards import feedback_buttons
+from tgbot.handlers.admin.keyboards import feedback_buttons, strategy_buttons, stock_buttons, time_button
 from tgbot.handlers.admin.utils import _get_csv_from_qs_values
 from tgbot.handlers.broadcast_message.static_text import feedback_text
 from tgbot.handlers.onboarding.handlers import invest_signal
@@ -23,15 +23,18 @@ def admin(update: Update, context: CallbackContext) -> None:
 
 def str_info(update: Update, context: CallbackContext) -> None:
     """ Show info about strategies """
-    update.message.reply_html(static_text.telegraph_1)
-    update.message.reply_html(static_text.telegraph_2)
+    strategy_with_links = (f'{static_text.strategy}\n'
+                           f'<a href="{static_text.sma_strategy_link}"><b>Среднее скользящее (cross-SMA)</b></a>\n'
+                           f'<a href="{static_text.rsi_strategy_link}"><b>Перепроданность по RSI</b></a>')
+    update.message.reply_html(strategy_with_links)
 
 
 def strategy(update: Update, context: CallbackContext) -> None:
     """ Start strategy """
 
     # TODO: remove, test
-    invest_signal(update, context)
+    # invest_signal(update, context)
+    update.message.reply_text(static_text.strategy, reply_markup=strategy_buttons())
 
     # TODO filter signals for user and add to db
 
@@ -39,12 +42,17 @@ def strategy(update: Update, context: CallbackContext) -> None:
 def stock(update: Update, context: CallbackContext) -> None:
     """ Filter by stocks """
     # TODO filter stocks for user and add to db
+    BUTTONS = update.message.reply_text(text=static_text.stock_choice, reply_markup=stock_buttons())
+    print(BUTTONS)
+
+    print(static_text.stock_choice)
 
 
 def time(update: Update, context: CallbackContext) -> None:
     """ Edit time for user """
     u = User.get_user(update, context)
-    update.message.reply_text(static_text.time_settings)
+    BUTTONS = update.message.reply_text(text=static_text.time_settings, reply_markup=time_button())
+    print(BUTTONS)
     # TODO edit time for user and add to db
 
 
@@ -91,6 +99,18 @@ def button(update: Update, context: CallbackContext) -> None:
         # TODO: DONE ask for reply
         update.callback_query.message.edit_text(feedback_text)
 
+    elif choice == 'rsi':
+        print('rsi is chosen')
+
+    elif choice == 'sma':
+        print('sma is chosen')
+
+    elif choice == 'NASDAQ-100':
+        print('NASDAQ-100 is chosen')
+
+    elif choice == 'Без ограничений':
+        print('Без ограничений')
+
 
 
 def off(update: Update, context: CallbackContext) -> None:
@@ -104,6 +124,8 @@ def off(update: Update, context: CallbackContext) -> None:
     text = update.message.text.encode('utf-8').decode()
     # for debugging purposes only
     print("got text message :", text)
+
+    update.message.reply_text(static_text.off_signals)
 
     # TODO filter signals to zero for user and add to db
 
