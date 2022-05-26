@@ -11,15 +11,18 @@ def feedback_buttons() -> InlineKeyboardMarkup:
 
 
 def strategy_buttons() -> InlineKeyboardMarkup:
-    buttons = [[InlineKeyboardButton('RSI', callback_data='rsi'),
-                InlineKeyboardButton('SMA', callback_data='sma')]]
+    buttons = [[InlineKeyboardButton('Скользящее среднее (SMA)', callback_data='rsi'),
+                InlineKeyboardButton('Перепроданность по RSI', callback_data='sma')]]
 
     return InlineKeyboardMarkup(buttons)
 
 
 def stock_buttons() -> InlineKeyboardMarkup:
-    buttons = [[InlineKeyboardButton('NASDAQ-100', callback_data='NASDAQ-100'),
-                InlineKeyboardButton('S&P 500', callback_data='S&P 500')]]
+    buttons = [
+               [InlineKeyboardButton('NASDAQ-100', callback_data='NASDAQ-100'),
+                InlineKeyboardButton('S&P 500', callback_data='S&P 500')],
+               [InlineKeyboardButton('Все акции', callback_data='all_shares')]
+    ]
 
     return InlineKeyboardMarkup(buttons)
 

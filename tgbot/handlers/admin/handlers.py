@@ -28,13 +28,14 @@ def str_info(update: Update, context: CallbackContext) -> None:
 
 
 def strategy(update: Update, context: CallbackContext) -> None:
-    """ Start strategy """
+    """ Add one more strategy """
 
     # TODO: remove, test
     # invest_signal(update, context)
-    update.message.reply_text(static_text.strategy, reply_markup=strategy_buttons())
+    update.message.reply_text(static_text.add_new_strategy, reply_markup=strategy_buttons())
 
     # TODO filter signals for user and add to db
+    # TODO +скрипт проверки включена ли уже стратегия у юзера
 
 
 def stock(update: Update, context: CallbackContext) -> None:
@@ -95,19 +96,32 @@ def button(update: Update, context: CallbackContext) -> None:
         update.callback_query.message.edit_text(static_text.feedback_text)
 
     elif choice == 'rsi':
+        update.callback_query.message.edit_text(static_text.rsi_chosen)
         print('rsi is chosen')
         # TODO: add data to db
 
     elif choice == 'sma':
+        update.callback_query.message.edit_text(static_text.sma_chosen)
         print('sma is chosen')
         # TODO: add data to db
 
     elif choice == 'NASDAQ-100':
+        update.callback_query.message.edit_text(static_text.nasdaq100_chosen)
         print('NASDAQ-100 is chosen')
         # TODO: add data to db
 
+    elif choice == 'S&P 500':
+        update.callback_query.message.edit_text(static_text.sp500_chosen)
+        print('NASDAQ-100 is chosen')
+        # TODO: add data to db
+
+    elif choice == 'all_shares':
+        update.callback_query.message.edit_text(static_text.all_shares_chosen)
+        print('all_shares_chosen')
+        # TODO: add data to db
+
     elif choice == 'time_unlimited':
-        update.callback_query.message.edit_text(f'{static_text.time_settings_unlimited}')
+        update.callback_query.message.edit_text(static_text.time_settings_unlimited)
         print('time_unlimited')
         # TODO: add data to db
 
