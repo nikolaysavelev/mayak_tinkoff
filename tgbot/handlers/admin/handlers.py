@@ -8,6 +8,7 @@ from tgbot.handlers.admin import static_text
 from tgbot.handlers.admin.keyboards import feedback_buttons, strategy_buttons, stock_buttons, time_button
 from tgbot.handlers.admin.utils import _get_csv_from_qs_values
 from tgbot.models import User
+from tgbot.handlers.onboarding.handlers import invest_signal  # do not delete (used in 'def strategy')
 
 
 def admin(update: Update, context: CallbackContext) -> None:
@@ -21,16 +22,12 @@ def admin(update: Update, context: CallbackContext) -> None:
 
 def str_info(update: Update, context: CallbackContext) -> None:
     """ Show info about strategies """
-    strategy_with_links = (f'{static_text.strategy_info}\n'
-                           f'<a href="{static_text.sma_strategy_link}"><b>Среднее скользящее (cross-SMA)</b></a>\n'
-                           f'<a href="{static_text.rsi_strategy_link}"><b>Перепроданность по RSI</b></a>')
-    update.message.reply_html(strategy_with_links)
+    update.message.reply_html(static_text.strategy_with_links, disable_web_page_preview=True)
 
 
 def strategy(update: Update, context: CallbackContext) -> None:
     """ Add one more strategy """
 
-    # TODO: remove, test
     # invest_signal(update, context)
     update.message.reply_text(static_text.add_new_strategy, reply_markup=strategy_buttons())
 
@@ -42,16 +39,12 @@ def stock(update: Update, context: CallbackContext) -> None:
     """ Filter by stocks """
     # TODO filter stocks for user and add to db
     buttons = update.message.reply_text(text=static_text.stock_choice, reply_markup=stock_buttons())
-    print(buttons)
-
-    print(static_text.stock_choice)
 
 
 def time(update: Update, context: CallbackContext) -> None:
     """ Edit time for user """
     u = User.get_user(update, context)
-    BUTTONS = update.message.reply_text(text=static_text.time_settings, reply_markup=time_button())
-    print(BUTTONS)
+    buttons = update.message.reply_text(text=static_text.time_settings, reply_markup=time_button())
     # TODO edit time for user and add to db
 
 
@@ -59,7 +52,6 @@ def feedback(update: Update, context: CallbackContext) -> None:
     """ feedback """
     u = User.get_user(update, context)
     buttons = update.message.reply_text(text=static_text.ask_feedback, reply_markup=feedback_buttons())
-    print(buttons)
 
     # TODO посмотрите что добавило в handlers для обработки колбэка + gjzdbkfcm функция button
     ##
@@ -84,11 +76,13 @@ def button(update: Update, context: CallbackContext) -> None:
 
     # Now u can define what choice ("callback_data") do what like this:
     if choice == 'positive_answer':
-        print('111')
+        update.callback_query.message.edit_text(static_text.positive_answer)
+        print('positive_answer')
         # TODO: add to DB
 
     elif choice == 'negative_answer':
-        print('----')
+        update.callback_query.message.edit_text(static_text.negative_answer)
+        print('negative_answer')
         # TODO: add to DB
 
     elif choice == 'ask_for_feedback':
@@ -96,12 +90,12 @@ def button(update: Update, context: CallbackContext) -> None:
         update.callback_query.message.edit_text(static_text.feedback_text)
 
     elif choice == 'rsi':
-        update.callback_query.message.edit_text(static_text.rsi_chosen)
+        update.callback_query.message.reply_html(static_text.rsi_chosen)
         print('rsi is chosen')
         # TODO: add data to db
 
     elif choice == 'sma':
-        update.callback_query.message.edit_text(static_text.sma_chosen)
+        update.callback_query.message.reply_html(static_text.sma_chosen)
         print('sma is chosen')
         # TODO: add data to db
 
