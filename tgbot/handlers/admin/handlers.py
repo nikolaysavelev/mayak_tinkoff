@@ -7,8 +7,6 @@ from telegram.ext import CallbackContext
 from tgbot.handlers.admin import static_text
 from tgbot.handlers.admin.keyboards import feedback_buttons, strategy_buttons, stock_buttons, time_button
 from tgbot.handlers.admin.utils import _get_csv_from_qs_values
-from tgbot.handlers.broadcast_message.static_text import feedback_text
-from tgbot.handlers.onboarding.handlers import invest_signal
 from tgbot.models import User
 
 
@@ -23,7 +21,7 @@ def admin(update: Update, context: CallbackContext) -> None:
 
 def str_info(update: Update, context: CallbackContext) -> None:
     """ Show info about strategies """
-    strategy_with_links = (f'{static_text.strategy}\n'
+    strategy_with_links = (f'{static_text.strategy_info}\n'
                            f'<a href="{static_text.sma_strategy_link}"><b>Среднее скользящее (cross-SMA)</b></a>\n'
                            f'<a href="{static_text.rsi_strategy_link}"><b>Перепроданность по RSI</b></a>')
     update.message.reply_html(strategy_with_links)
@@ -42,8 +40,8 @@ def strategy(update: Update, context: CallbackContext) -> None:
 def stock(update: Update, context: CallbackContext) -> None:
     """ Filter by stocks """
     # TODO filter stocks for user and add to db
-    BUTTONS = update.message.reply_text(text=static_text.stock_choice, reply_markup=stock_buttons())
-    print(BUTTONS)
+    buttons = update.message.reply_text(text=static_text.stock_choice, reply_markup=stock_buttons())
+    print(buttons)
 
     print(static_text.stock_choice)
 
@@ -59,8 +57,8 @@ def time(update: Update, context: CallbackContext) -> None:
 def feedback(update: Update, context: CallbackContext) -> None:
     """ feedback """
     u = User.get_user(update, context)
-    BUTTONS = update.message.reply_text(text=static_text.ask_feedback, reply_markup=feedback_buttons())
-    print(BUTTONS)
+    buttons = update.message.reply_text(text=static_text.ask_feedback, reply_markup=feedback_buttons())
+    print(buttons)
 
     # TODO посмотрите что добавило в handlers для обработки колбэка + gjzdbkfcm функция button
     ##
@@ -69,20 +67,18 @@ def feedback(update: Update, context: CallbackContext) -> None:
     print(update.message.text)
     # TODO save in the heart and db
 
-def get_feedback(update: Update, context: CallbackContext) -> None:
-    # TODO: DONE get user text
-    feedback_text = update.message.text
-    update.message.reply_text(f"comments: {update.message.text}")
 
-    update.message.reply_text(feedback_text)
-    print(feedback_text)
-    # TODO: проверить - фидбэк ли это(протащить стейт) и если да - записать в DB
+def get_feedback(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(f"Спасибо за ваш отзыв! Мы успешно получили ваше сообщение: '{update.message.text}'")
+    # TODO: записать в DB 'update.message.text'
+
 
 def button(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     query.answer()
 
-    # This will define which button the user tapped on (from what you assigned to "callback_data". As I assigned them "1" and "2"):
+    # This will define which button the user tapped on
+    # (from what you assigned to "callback_data". As I assigned them "1" and "2"):
     choice = query.data
 
     # Now u can define what choice ("callback_data") do what like this:
@@ -96,21 +92,24 @@ def button(update: Update, context: CallbackContext) -> None:
 
     elif choice == 'ask_for_feedback':
         print('feedback requested')
-        # TODO: DONE ask for reply
-        update.callback_query.message.edit_text(feedback_text)
+        update.callback_query.message.edit_text(static_text.feedback_text)
 
     elif choice == 'rsi':
         print('rsi is chosen')
+        # TODO: add data to db
 
     elif choice == 'sma':
         print('sma is chosen')
+        # TODO: add data to db
 
     elif choice == 'NASDAQ-100':
         print('NASDAQ-100 is chosen')
+        # TODO: add data to db
 
-    elif choice == 'Без ограничений':
-        print('Без ограничений')
-
+    elif choice == 'time_unlimited':
+        update.callback_query.message.edit_text(f'{static_text.time_settings_unlimited}')
+        print('time_unlimited')
+        # TODO: add data to db
 
 
 def off(update: Update, context: CallbackContext) -> None:

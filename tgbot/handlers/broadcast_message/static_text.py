@@ -11,7 +11,3 @@ decline_broadcast = "Decline ❌"
 message_is_sent = "Message is sent ✅"
 declined_message_broadcasting = "Message broadcasting is declined ❌"
 error_with_html = "Can't parse your text in <code>HTML</code> style. Reason: \n{reason}"
-
-feedback_text = 'Мы будем рады любым вашим отзывам и предложениям. Просто напишите их ниже'
-
-# TODO: переписать на загрузку из файла!

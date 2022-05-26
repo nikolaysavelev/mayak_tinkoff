@@ -55,9 +55,9 @@ def setup_dispatcher(dp):
     # handling errors
     dp.add_error_handler(error.send_stacktrace_to_tg_chat)
 
-    #TODO: обратите внимание - здесь обработчик кнопок
+    # TODO: обратите внимание - здесь обработчик кнопок
     dp.add_handler(CallbackQueryHandler(button))
-    #TODO: обратите внимание - здесь сбор сообщений из чата
+    # TODO: обратите внимание - здесь сбор сообщений из чата
     dp.add_handler(MessageHandler(Filters.text, get_feedback))
 
     # EXAMPLES FOR HANDLERS
