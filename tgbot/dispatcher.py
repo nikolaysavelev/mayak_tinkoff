@@ -16,7 +16,7 @@ from telegram.ext import (
 from dtb.celery import app  # event processing in async mode
 from dtb.settings import TELEGRAM_TOKEN, DEBUG
 from tgbot.handlers.admin import handlers as admin_handlers
-from tgbot.handlers.admin.handlers import button, get_feedback
+from tgbot.handlers.admin.handlers import button, reply_feedback
 from tgbot.handlers.broadcast_message import handlers as broadcast_handlers
 from tgbot.handlers.broadcast_message.manage_data import CONFIRM_DECLINE_BROADCAST
 from tgbot.handlers.broadcast_message.static_text import broadcast_command
@@ -58,7 +58,7 @@ def setup_dispatcher(dp):
     # TODO: обратите внимание - здесь обработчик кнопок
     dp.add_handler(CallbackQueryHandler(button))
     # TODO: обратите внимание - здесь сбор сообщений из чата
-    dp.add_handler(MessageHandler(Filters.text, get_feedback))
+    dp.add_handler(MessageHandler(Filters.text, reply_feedback))
 
     # EXAMPLES FOR HANDLERS
     # dp.add_handler(MessageHandler(Filters.text, <function_handler>))

@@ -42,3 +42,4 @@ def send_stacktrace_to_tg_chat(update: Update, context: CallbackContext) -> None
         )
     else:
         logging.error(admin_message)
+        # TODO save errors to DB

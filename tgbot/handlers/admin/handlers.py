@@ -54,17 +54,9 @@ def feedback(update: Update, context: CallbackContext) -> None:
     u = User.get_user(update, context)
     buttons = update.message.reply_text(text=static_text.ask_feedback, reply_markup=feedback_buttons())
 
-    # TODO посмотрите что добавило в handlers для обработки колбэка + gjzdbkfcm функция button
-    ##
-    User.get_user(update, context)
 
-    print(update.message.text)
-    # TODO save in the heart and db
-
-
-def get_feedback(update: Update, context: CallbackContext) -> None:
+def reply_feedback(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(f"Спасибо за ваш отзыв! Мы успешно получили ваше сообщение: '{update.message.text}'")
-    # TODO: записать в DB 'update.message.text'
 
 
 def button(update: Update, context: CallbackContext) -> None:
@@ -78,46 +70,38 @@ def button(update: Update, context: CallbackContext) -> None:
     # Now u can define what choice ("callback_data") do what like this:
     if choice == 'positive_answer':
         update.callback_query.message.edit_text(static_text.positive_answer)
-        print('positive_answer')
         # TODO: add to DB
 
     elif choice == 'negative_answer':
         update.callback_query.message.edit_text(static_text.negative_answer)
-        print('negative_answer')
-        # TODO: add to DB
+        # TODO: записать в DB 'update.message.text'
 
     elif choice == 'ask_for_feedback':
-        print('feedback requested')
         update.callback_query.message.edit_text(static_text.feedback_text)
+        # TODO: записать в DB 'update.message.text'
 
     elif choice == 'rsi':
         update.callback_query.message.reply_html(static_text.rsi_chosen)
-        print('rsi is chosen')
         # TODO: add data to db
 
     elif choice == 'sma':
         update.callback_query.message.reply_html(static_text.sma_chosen)
-        print('sma is chosen')
         # TODO: add data to db
 
     elif choice == 'NASDAQ-100':
         update.callback_query.message.edit_text(static_text.nasdaq100_chosen)
-        print('NASDAQ-100 is chosen')
         # TODO: add data to db
 
     elif choice == 'S&P 500':
         update.callback_query.message.edit_text(static_text.sp500_chosen)
-        print('NASDAQ-100 is chosen')
         # TODO: add data to db
 
     elif choice == 'all_shares':
         update.callback_query.message.edit_text(static_text.all_shares_chosen)
-        print('all_shares_chosen')
         # TODO: add data to db
 
     elif choice == 'time_unlimited':
         update.callback_query.message.edit_text(static_text.time_settings_unlimited)
-        print('time_unlimited')
         # TODO: add data to db
 
 
