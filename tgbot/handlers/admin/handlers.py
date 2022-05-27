@@ -1,23 +1,24 @@
-from datetime import timedelta
+from datetime import timedelta  # (used in 'def stats')
+from django.utils.timezone import now  # (used in 'def stats')
 
-from django.utils.timezone import now
-from telegram import ParseMode, Update
+from telegram import ParseMode, Update  # (parse_mode used in 'def stats')
 from telegram.ext import CallbackContext
 
 from tgbot.handlers.admin import static_text
 from tgbot.handlers.admin.keyboards import feedback_buttons, strategy_buttons, stock_buttons, time_button
-from tgbot.handlers.admin.utils import _get_csv_from_qs_values
+from tgbot.handlers.admin.utils import _get_csv_from_qs_values  # (used in 'def export_users')
 from tgbot.models import User
-from tgbot.handlers.onboarding.handlers import invest_signal  # do not delete (used in 'def strategy')
+from tgbot.handlers.onboarding.handlers import invest_signal  # (used in 'def strategy')
 
 
-def admin(update: Update, context: CallbackContext) -> None:
-    """ Show help info about all secret admins commands """
-    u = User.get_user(update, context)
-    if not u.is_admin:
-        update.message.reply_text(static_text.only_for_admins)
-        return
-    update.message.reply_text(static_text.secret_admin_commands)
+# TODO удалим ли эту функцию?
+#def admin(update: Update, context: CallbackContext) -> None:
+#    """ Show help info about all secret admins commands """
+#    u = User.get_user(update, context)
+#    if not u.is_admin:
+#        update.message.reply_text(static_text.only_for_admins)
+#        return
+#    update.message.reply_text(static_text.secret_admin_commands)
 
 
 def str_info(update: Update, context: CallbackContext) -> None:
@@ -127,6 +128,7 @@ def off(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat.id
     msg_id = update.message.message_id
 
+    # TODO зачем 4 строки снизу?
     # Telegram understands UTF-8, so encode text for unicode compatibility
     text = update.message.text.encode('utf-8').decode()
     # for debugging purposes only
@@ -136,33 +138,33 @@ def off(update: Update, context: CallbackContext) -> None:
 
     # TODO filter signals to zero for user and add to db
 
+# TODO удалим ли эту функцию?
+#def stats(update: Update, context: CallbackContext) -> None:
+#    """ Show help info about all secret admins commands """
+#    u = User.get_user(update, context)
+#    if not u.is_admin:
+#        update.message.reply_text(static_text.only_for_admins)
+#        return
+#
+#    text = static_text.users_amount_stat.format(
+#        user_count=User.objects.count(),  # count may be ineffective if there are a lot of users.
+#        active_24=User.objects.filter(updated_at__gte=now() - timedelta(hours=24)).count()
+#    )
+#
+#    update.message.reply_text(
+#        text,
+#        parse_mode=ParseMode.HTML,
+#        disable_web_page_preview=True,
+#    )
 
-def stats(update: Update, context: CallbackContext) -> None:
-    """ Show help info about all secret admins commands """
-    u = User.get_user(update, context)
-    if not u.is_admin:
-        update.message.reply_text(static_text.only_for_admins)
-        return
-
-    text = static_text.users_amount_stat.format(
-        user_count=User.objects.count(),  # count may be ineffective if there are a lot of users.
-        active_24=User.objects.filter(updated_at__gte=now() - timedelta(hours=24)).count()
-    )
-
-    update.message.reply_text(
-        text,
-        parse_mode=ParseMode.HTML,
-        disable_web_page_preview=True,
-    )
-
-
-def export_users(update: Update, context: CallbackContext) -> None:
-    u = User.get_user(update, context)
-    if not u.is_admin:
-        update.message.reply_text(static_text.only_for_admins)
-        return
-
-    # in values argument you can specify which fields should be returned in output csv
-    users = User.objects.all().values()
-    csv_users = _get_csv_from_qs_values(users)
-    context.bot.send_document(chat_id=u.user_id, document=csv_users)
+# TODO удалим ли эту функцию?
+#def export_users(update: Update, context: CallbackContext) -> None:
+#    u = User.get_user(update, context)
+#    if not u.is_admin:
+#        update.message.reply_text(static_text.only_for_admins)
+#        return
+#
+#    # in values argument you can specify which fields should be returned in output csv
+#    users = User.objects.all().values()
+#    csv_users = _get_csv_from_qs_values(users)
+#    context.bot.send_document(chat_id=u.user_id, document=csv_users)

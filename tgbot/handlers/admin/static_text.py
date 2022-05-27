@@ -22,10 +22,10 @@ negative_answer = df_texts.feedback[3]
 stock_choice = df_texts.stock_choice[0]
 nasdaq100_chosen = df_texts.stock_choice[3]
 sp500_chosen = df_texts.stock_choice[4]
-all_shares_chosen = f'{df_texts.stock_choice[5]} \U0001F44D'
+all_shares_chosen = f'{df_texts.stock_choice[5]} 👍'
 
 time_settings = df_texts.time[0]
-time_settings_unlimited = f'{df_texts.time[1]} \U0001F44D'
+time_settings_unlimited = f'{df_texts.time[1]} 👍'
 
 off_signals = df_texts.off_signals[0]
 
