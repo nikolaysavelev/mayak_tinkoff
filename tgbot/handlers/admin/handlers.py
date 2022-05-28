@@ -2,7 +2,7 @@ from datetime import timedelta  # (used in 'def stats')
 from django.utils.timezone import now  # (used in 'def stats')
 
 from telegram import ParseMode, Update  # (parse_mode used in 'def stats')
-from telegram.ext import CallbackContext
+from telegram.ext import CallbackContext, ConversationHandler
 
 from tgbot.handlers.admin import static_text
 from tgbot.handlers.admin.keyboards import feedback_buttons, strategy_buttons, stock_buttons, time_button
@@ -10,6 +10,7 @@ from tgbot.handlers.admin.utils import _get_csv_from_qs_values  # (used in 'def 
 from tgbot.models import User
 from tgbot.handlers.onboarding.handlers import invest_signal  # (used in 'def strategy')
 
+GET_FEEDBACK_STATE = 1
 
 # TODO удалим ли эту функцию?
 #def admin(update: Update, context: CallbackContext) -> None:
@@ -54,9 +55,17 @@ def feedback(update: Update, context: CallbackContext) -> None:
     u = User.get_user(update, context)
     buttons = update.message.reply_text(text=static_text.ask_feedback, reply_markup=feedback_buttons())
 
+    return GET_FEEDBACK_STATE
 
-def reply_feedback(update: Update, context: CallbackContext) -> None:
+
+def get_feedback(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(f"Спасибо за ваш отзыв! Мы успешно получили ваше сообщение: '{update.message.text}'")
+
+    return ConversationHandler.END
+
+
+def cancel_feedback() -> None:
+    return ConversationHandler.END
 
 
 def button(update: Update, context: CallbackContext) -> None:
