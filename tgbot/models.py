@@ -75,6 +75,23 @@ class User(CreateUpdateTracker):
         return f"{self.first_name} {self.last_name}" if self.last_name else f"{self.first_name}"
 
 
+class StrategyType(models.Model):
+    STRATEGIES = (
+        ('SMA', 'Средняя скользяшка'),
+        ('RSI', 'RSI'),
+    )
+    id = models.BigAutoField(primary_key=True)
+    strategy_name = models.CharField(max_length=10, choices=STRATEGIES)
+
+
+class Strategy(CreateUpdateTracker):
+    user_id = models.PositiveBigIntegerField(primary_key=True)
+    strategy_id = models.ForeignKey(StrategyType, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "%s %s" % (self.user_id, self.strategy_id)
+
+
 class Location(CreateTracker):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     latitude = models.FloatField()

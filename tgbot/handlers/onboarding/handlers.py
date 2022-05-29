@@ -16,7 +16,7 @@ def command_start(update: Update, context: CallbackContext) -> None:
     # else:
     #     text = static_text.start_not_created.format(first_name=u.first_name) TODO прикрутим обращение по имени?
 
-    update.message.reply_html(static_text.start_not_created,
+    update.message.reply_html(static_text.start_not_created.format(first_name=u.first_name),
                               reply_markup=make_keyboard_for_strategy(),
                               disable_web_page_preview=True)
 
