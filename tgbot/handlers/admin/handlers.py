@@ -7,7 +7,7 @@ from telegram.ext import CallbackContext, ConversationHandler
 from tgbot.handlers.admin import static_text
 from tgbot.handlers.admin.keyboards import feedback_buttons, strategy_buttons, stock_buttons, time_button
 from tgbot.handlers.admin.utils import _get_csv_from_qs_values  # (used in 'def export_users')
-from tgbot.models import User
+from tgbot.models import User, Strategy
 from tgbot.handlers.onboarding.handlers import invest_signal  # (used in 'def strategy')
 
 GET_FEEDBACK_STATE = 1
@@ -91,10 +91,14 @@ def button(update: Update, context: CallbackContext) -> None:
 
     elif choice == 'rsi':
         update.callback_query.message.reply_html(static_text.rsi_chosen)
+        u, created = Strategy.get_strategy_and_created(update, context)
+        print(context)
         # TODO: add data to db
 
     elif choice == 'sma':
         update.callback_query.message.reply_html(static_text.sma_chosen)
+        u, created = Strategy.get_strategy_and_created(update, context)
+        print(context)
         # TODO: add data to db
 
     elif choice == 'NASDAQ-100':

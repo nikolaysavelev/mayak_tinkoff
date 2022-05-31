@@ -9,6 +9,7 @@ from tgbot.handlers.onboarding.keyboards import make_keyboard_for_strategy, make
 
 def command_start(update: Update, context: CallbackContext) -> None:
     u, created = User.get_user_and_created(update, context)
+    print(context)
     user_ids = list(User.objects.all().values_list('user_id', flat=True))
 
     # if created:

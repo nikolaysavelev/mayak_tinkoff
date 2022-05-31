@@ -56,7 +56,7 @@ class LocationAdmin(admin.ModelAdmin):
 
 @admin.register(Strategy)
 class StrategyAdmin(admin.ModelAdmin):
-    list_display = ['user_id', 'strategy_id']
+    list_display = ['user_id', 'strategy_name']
 
 
 @admin.register(StrategyType)

@@ -86,10 +86,28 @@ class StrategyType(models.Model):
 
 class Strategy(CreateUpdateTracker):
     user_id = models.PositiveBigIntegerField(primary_key=True)
-    strategy_id = models.ForeignKey(StrategyType, on_delete=models.CASCADE)
+    strategy_name = models.CharField(max_length=3, **nb)
+
+    objects = GetOrNoneManager()
+
+    @classmethod
+    def get_strategy_and_created(cls, update: Update, context: CallbackContext) -> Tuple[User, bool]:
+        """ python-telegram-bot's Update, Context --> User instance """
+        print('context', update.callback_query.data)
+        data = extract_user_data_from_update(update)
+        bata = {'strategy_name': update.callback_query.data}
+        u, created = cls.objects.update_or_create(user_id=data["user_id"],
+                                                  defaults=bata)
+        print(created)
+
+        if created:
+            print('hi DEBUG')
+            #TODO написать функции фильтрации стратегий для рассыльщика
+
+        return u, created
 
     def __str__(self):
-        return "%s %s" % (self.user_id, self.strategy_id)
+        return "%s %s" % (self.user_id, self.strategy_name)
 
 
 class Location(CreateTracker):
