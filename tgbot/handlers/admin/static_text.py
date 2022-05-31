@@ -1,6 +1,8 @@
 import pandas as pd
 
 df_texts = pd.read_csv('static_texts.csv', sep=',')
+df_signals_sma = pd.read_csv('Historic_signals_RSI', sep=',')
+df_signals_rsi = pd.read_csv('Historic_signals_SMA', sep=',')
 
 sma_strategy_link = df_texts.str_info[0]
 rsi_strategy_link = df_texts.str_info[1]
