@@ -5,7 +5,7 @@ from telegram import ParseMode, Update  # (parse_mode used in 'def stats')
 from telegram.ext import CallbackContext, ConversationHandler
 
 from tgbot.handlers.admin import static_text
-from tgbot.handlers.admin.keyboards import feedback_buttons, strategy_buttons, stock_buttons, time_button
+from tgbot.handlers.admin.keyboards import feedback_buttons, strategy_buttons, stock_buttons, time_button, buy_button
 from tgbot.handlers.admin.utils import _get_csv_from_qs_values  # (used in 'def export_users')
 from tgbot.models import User, Strategy
 from tgbot.handlers.onboarding.handlers import invest_signal  # (used in 'def strategy')
@@ -91,12 +91,18 @@ def button(update: Update, context: CallbackContext) -> None:
 
     elif choice == 'rsi':
         update.callback_query.message.reply_html(static_text.rsi_chosen)
+        update.callback_query.message.reply_html(static_text.df_text_signals_rsi.loc[-1][0], reply_markup=buy_button())
+        update.callback_query.message.reply_html(static_text.df_text_signals_rsi.loc[-2][0], reply_markup=buy_button())
+        update.callback_query.message.reply_html(static_text.df_text_signals_rsi.loc[-3][0], reply_markup=buy_button())
         u, created = Strategy.get_strategy_and_created(update, context)
         print(context)
         # TODO: add data to db
 
     elif choice == 'sma':
         update.callback_query.message.reply_html(static_text.sma_chosen)
+        update.callback_query.message.reply_html(static_text.df_text_signals_sma.loc[-1][0], reply_markup=buy_button())
+        update.callback_query.message.reply_html(static_text.df_text_signals_sma.loc[-2][0], reply_markup=buy_button())
+        update.callback_query.message.reply_html(static_text.df_text_signals_sma.loc[-3][0], reply_markup=buy_button())
         u, created = Strategy.get_strategy_and_created(update, context)
         print(context)
         # TODO: add data to db

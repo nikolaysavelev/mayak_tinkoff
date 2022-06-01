@@ -31,3 +31,9 @@ def time_button() -> InlineKeyboardMarkup:
     buttons = [[InlineKeyboardButton('Без ограничений', callback_data='time_unlimited')]]
 
     return InlineKeyboardMarkup(buttons)
+
+
+def buy_button():
+    buttons = [[InlineKeyboardButton('Купить', callback_data='buy_share')]]  # TODO доработать диплинк + UTM
+
+    return InlineKeyboardMarkup(buttons)
