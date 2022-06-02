@@ -17,9 +17,9 @@ for i in range(-1, -4, -1):
         action_sma_2 = '↘'
     ticker_sma = df_signals_sma.iloc[i].ticker
     last_price_sma = df_signals_sma.iloc[i].last_price
-    date_sma = df_signals_sma.iloc[i].date
-    currency_sma = df_signals_sma.illoc[i].currency
-    share_name_sma = df_signals_sma.illoc[i].name
+    date_sma = df_signals_sma.iloc[i].datetime
+    currency_sma = df_signals_sma.iloc[i].currency
+    share_name_sma = df_signals_sma.iloc[i].name
     investments_text_sma = f"Купить <b>{ticker_sma}</b> по <b>{last_price_sma} {currency_sma}<b> в Тинькофф Инвестициях"
     signal_text_sma = f"{action_sma}\n" \
                       f"{share_name_sma} (${ticker_sma}) {last_price_sma} {currency_sma}\n" \
@@ -27,6 +27,7 @@ for i in range(-1, -4, -1):
                       f"🕓{date_sma}"  # TODO заменить месяц на МАЙ вместо 05? Добавить время сигнала,
     # TODO добавить доходность
     buy_button_text_sma = f"Купить <b>{ticker_sma}</b> по <b>{last_price_sma} {currency_sma}<b> в Тинькофф Инвестициях"
+    user_id = 1  # TODO исрпавить
     url_sma = f'http://www.tinkoff.ru/invest/stocks/{ticker_sma}?utm_source=mayak_bot&utm_content={user_id}'
     df_text_signals_sma.loc[-i] = [signal_text_sma, buy_button_text_sma, url_sma]  # TODO изменить индексирование DF
 
@@ -43,8 +44,9 @@ for i in range(-1, -4, -1):
     ticker_rsi = df_signals_rsi.iloc[i].ticker
     last_price_rsi = df_signals_rsi.iloc[i].last_price
     date_rsi = df_signals_rsi.iloc[i].datetime
-    currency_rsi = df_signals_rsi.illoc[i].currency
-    share_name_rsi = df_signals_rsi.illoc[i].name
+    currency_rsi = 'USD'  # TODO currency_rsi = df_signals_rsi.iloc[i].currency
+    share_name_rsi = df_signals_rsi.iloc[i].name
+
     investments_text_rsi = f"Купить <b>{ticker_rsi}</b> по <b>{last_price_rsi} {currency_rsi}<b> в Тинькофф Инвестициях"
     signal_text_rsi = f"{action_rsi}\n" \
                       f"{share_name_rsi} (${ticker_rsi}) {last_price_rsi} {currency_rsi}\n" \
@@ -52,6 +54,7 @@ for i in range(-1, -4, -1):
                       f"🕓{date_rsi}"  # TODO заменить месяц на МАЙ вместо 05? Добавить время сигнала,
     # TODO добавить доходность
     buy_button_text_rsi = f"Купить <b>{ticker_rsi}</b> по <b>{last_price_rsi} {currency_rsi}<b> в Тинькофф Инвестициях"
+    user_id = 1  # TODO исрпавить
     url_rsi = f'http://www.tinkoff.ru/invest/stocks/{ticker_rsi}?utm_source=mayak_bot&utm_content={user_id}'
     df_text_signals_rsi.loc[-i] = [signal_text_rsi, buy_button_text_rsi, url_rsi]
 

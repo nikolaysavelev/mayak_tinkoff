@@ -90,7 +90,7 @@ def ask_for_feedback(update: Update, _) -> int:
 
 def get_feedback(update: Update, _) -> int:
     """ Collect text then end conversation """
-    update.message.reply_text(f"Спасибо за ваш отзыв! Мы успешно получили ваше сообщение: '{update.message.text}'")
+    update.message.reply_text(f"Юля, с днём рождения! Мы тебя любим и очень-очень ценим <3 А вот и твой сюрприз: https://disk.yandex.ru/i/YSgy2SF-sALQjw")  # Спасибо за ваш отзыв! Мы успешно получили ваше сообщение: '{update.message.text}'
 
     return ConversationHandler.END
 
