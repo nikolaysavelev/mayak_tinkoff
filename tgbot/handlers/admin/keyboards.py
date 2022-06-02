@@ -1,4 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from tgbot.handlers.admin.static_text import url
 
 
 def feedback_buttons() -> InlineKeyboardMarkup:
@@ -33,7 +34,7 @@ def time_button() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(buttons)
 
 
-def buy_button():
-    buttons = [[InlineKeyboardButton('Купить', callback_data='buy_share')]]  # TODO доработать диплинк + UTM
+def buy_button_sma_1():  # TODO можем ли объединить 3 функции в одну?
+    buttons = [[InlineKeyboardButton('Купить', callback_data='buy_share', url=f'http://www.tinkoff.ru/invest/stocks/{ticker_sma}?utm_source=mayak_bot&utm_content={user_id}')]]
 
     return InlineKeyboardMarkup(buttons)
