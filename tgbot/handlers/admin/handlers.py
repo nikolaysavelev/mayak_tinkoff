@@ -10,7 +10,7 @@ from tgbot.handlers.admin.utils import _get_csv_from_qs_values  # (used in 'def 
 from tgbot.models import User, Strategy
 from tgbot.handlers.onboarding.handlers import invest_signal  # (used in 'def strategy')
 
-GET_FEEDBACK_STATE = 1
+ASK_FOR_FEEDBACK_STATE, GET_FEEDBACK_STATE = range(2)
 
 # TODO удалим ли эту функцию?
 #def admin(update: Update, context: CallbackContext) -> None:
@@ -50,24 +50,58 @@ def time(update: Update, context: CallbackContext) -> None:
     # TODO edit time for user and add to db
 
 
-def feedback(update: Update, context: CallbackContext) -> None:
+def feedback(update: Update, context: CallbackContext) -> int:
     """ feedback """
     u = User.get_user(update, context)
     buttons = update.message.reply_text(text=static_text.ask_feedback, reply_markup=feedback_buttons())
 
+    return ASK_FOR_FEEDBACK_STATE
+
+
+def positive_feedback(update: Update, _) -> int:
+    """ Handle thumbs up button then end conversation """
+    query = update.callback_query
+    query.answer()
+
+    query.edit_message_text(static_text.positive_answer)
+
+    return ConversationHandler.END
+
+
+def negative_feedback(update: Update, _) -> int:
+    """ Handle thumbs down button then ask to write the reason """
+    query = update.callback_query
+    query.answer()
+
+    query.edit_message_text(static_text.negative_answer)
+
     return GET_FEEDBACK_STATE
 
 
-def get_feedback(update: Update, context: CallbackContext) -> None:
+def ask_for_feedback(update: Update, _) -> int:
+    """ Handle third button then wait feedback """
+    query = update.callback_query
+    query.answer()
+
+    query.edit_message_text(static_text.feedback_text)
+
+    return GET_FEEDBACK_STATE
+
+
+def get_feedback(update: Update, _) -> int:
+    """ Collect text then end conversation """
     update.message.reply_text(f"Спасибо за ваш отзыв! Мы успешно получили ваше сообщение: '{update.message.text}'")
 
     return ConversationHandler.END
 
 
-def cancel_feedback() -> None:
+def cancel_feedback(update: Update, _) -> int:
+    """ cancel feedback process """
+    update.message.reply_text('Команда отменена')
+
     return ConversationHandler.END
 
-
+# TODO: разбить на разные обработчики
 def button(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     query.answer()
@@ -77,19 +111,8 @@ def button(update: Update, context: CallbackContext) -> None:
     choice = query.data
 
     # Now u can define what choice ("callback_data") do what like this:
-    if choice == 'positive_answer':
-        update.callback_query.message.edit_text(static_text.positive_answer)
-        # TODO: add to DB
 
-    elif choice == 'negative_answer':
-        update.callback_query.message.edit_text(static_text.negative_answer)
-        # TODO: записать в DB 'update.message.text'
-
-    elif choice == 'ask_for_feedback':
-        update.callback_query.message.edit_text(static_text.feedback_text)
-        # TODO: записать в DB 'update.message.text'
-
-    elif choice == 'rsi':
+    if choice == 'rsi':
         update.callback_query.message.reply_html(static_text.rsi_chosen)
         update.callback_query.message.reply_html(static_text.df_text_signals_rsi.loc[1].text[0],
                                                  reply_markup=buy_button())
