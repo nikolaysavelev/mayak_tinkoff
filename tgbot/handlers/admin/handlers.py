@@ -105,22 +105,22 @@ def button(update: Update, context: CallbackContext) -> None:
 
     if choice == 'rsi':
         update.callback_query.message.reply_html(static_text.rsi_chosen)
-        update.callback_query.message.reply_html(static_text.df_text_signals_rsi.loc[1].text[0],
+        update.callback_query.message.reply_html(static_text.df_text_signals_rsi.text[1],
                                                  reply_markup=buy_button())
-        update.callback_query.message.reply_html(static_text.df_text_signals_rsi.loc[2].text[0],
+        update.callback_query.message.reply_html(static_text.df_text_signals_rsi.text[2],
                                                  reply_markup=buy_button())
-        update.callback_query.message.reply_html(static_text.df_text_signals_rsi.loc[3].text[0],
+        update.callback_query.message.reply_html(static_text.df_text_signals_rsi.text[3],
                                                  reply_markup=buy_button())
-        u, created = Strategy.get_strategy_and_created(update, context)
+        # u, created = Strategy.get_strategy_and_created(update, context)
         # TODO: add data to db
 
     elif choice == 'sma':
         update.callback_query.message.reply_html(static_text.sma_chosen)
-        update.callback_query.message.reply_html(static_text.df_text_signals_sma.loc[1].text[0],
+        update.callback_query.message.reply_html(static_text.df_text_signals_sma.text[1],
                                                  reply_markup=buy_button())
-        update.callback_query.message.reply_html(static_text.df_text_signals_sma.loc[2].text[0],
+        update.callback_query.message.reply_html(static_text.df_text_signals_sma.text[2],
                                                  reply_markup=buy_button())
-        update.callback_query.message.reply_html(static_text.df_text_signals_sma.loc[3].text[0],
+        update.callback_query.message.reply_html(static_text.df_text_signals_sma.text[3],
                                                  reply_markup=buy_button())
 
         # u, created = Strategy.get_strategy_and_created(update, context)
