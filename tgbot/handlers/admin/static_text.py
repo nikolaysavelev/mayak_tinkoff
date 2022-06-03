@@ -1,6 +1,6 @@
 import pandas as pd
 
-df_texts = pd.read_csv('static_texts.csv', sep=',')
+df_texts = pd.read_csv('static_texts.csv', sep=';')
 df_signals_sma = pd.read_csv('historic_signals_rsi.csv', sep=';')
 df_signals_rsi = pd.read_csv('historic_signals_sma.csv', sep=';')
 df_text_signals_sma = pd.DataFrame(columns=['text', 'button_text', 'url'])
@@ -73,6 +73,7 @@ ask_feedback = df_texts.feedback[0]
 feedback_text = df_texts.feedback[1]
 positive_answer = df_texts.feedback[2]
 negative_answer = df_texts.feedback[3]
+final_answer = df_texts.feedback[4]
 
 stock_choice = df_texts.stock_choice[0]
 nasdaq100_chosen = df_texts.stock_choice[3]

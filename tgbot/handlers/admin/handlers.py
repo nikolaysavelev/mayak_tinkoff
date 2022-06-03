@@ -34,6 +34,7 @@ def time(update: Update, context: CallbackContext) -> None:
     """ Edit time for user """
     u = User.get_user(update, context)
     buttons = update.message.reply_text(text=static_text.time_settings, reply_markup=time_button())
+    #TODO не забыть включить обработку текста
     # TODO edit time for user and add to db
 
 
@@ -182,3 +183,4 @@ def reply_feedback(update: Update, context: CallbackContext) -> None:
     if CALL_FOR_CATCH:
         print(update.message.text)
         CALL_FOR_CATCH = False
+        update.message.reply_text(static_text.final_answer)
