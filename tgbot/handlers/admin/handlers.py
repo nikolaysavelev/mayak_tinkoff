@@ -110,7 +110,7 @@ def button(update: Update, context: CallbackContext) -> None:
                                                  reply_markup=buy_button())
         update.callback_query.message.reply_html(static_text.df_text_signals_rsi.text[3],
                                                  reply_markup=buy_button())
-        u, created = Strategy.get_strategy_and_created(update, context)
+        # u, created = Strategy.get_strategy_and_created(update, context)
         # TODO: add data to db
 
     elif choice == 'sma':
