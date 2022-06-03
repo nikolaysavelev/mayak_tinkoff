@@ -94,10 +94,11 @@ class Strategy(CreateUpdateTracker):
     def get_strategy_and_created(cls, update: Update, context: CallbackContext):  # -> Tuple[User, bool]:
         """ python-telegram-bot's Update, Context --> User instance """
         print('context', update.callback_query.data)
-        # TODO здесь все ломалось - пока зкомитила - обратите внимание
-        '''data = extract_user_data_from_update(update)
+
+        data = extract_user_data_from_update(update)
         bata = {'strategy_name': update.callback_query.data}
-        u, created = cls.objects.update_or_create(user_id=data["user_id"],
+        # TODO здесь все ломалось - пока зкомитила - обратите внимание
+        '''u, created = cls.objects.update_or_create(user_id=data["user_id"],
                                                   defaults=bata)
         #print(created)
 
