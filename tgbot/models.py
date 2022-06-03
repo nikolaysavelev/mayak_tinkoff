@@ -91,20 +91,21 @@ class Strategy(CreateUpdateTracker):
     objects = GetOrNoneManager()
 
     @classmethod
-    def get_strategy_and_created(cls, update: Update, context: CallbackContext) -> Tuple[User, bool]:
+    def get_strategy_and_created(cls, update: Update, context: CallbackContext):  # -> Tuple[User, bool]:
         """ python-telegram-bot's Update, Context --> User instance """
         print('context', update.callback_query.data)
-        data = extract_user_data_from_update(update)
+        # TODO здесь все ломалось - пока зкомитила - обратите внимание
+        '''data = extract_user_data_from_update(update)
         bata = {'strategy_name': update.callback_query.data}
         u, created = cls.objects.update_or_create(user_id=data["user_id"],
                                                   defaults=bata)
-        print(created)
+        #print(created)
 
         if created:
             print('hi DEBUG')
             #TODO написать функции фильтрации стратегий для рассыльщика
 
-        return u, created
+        return u, created'''
 
     def __str__(self):
         return "%s %s" % (self.user_id, self.strategy_name)

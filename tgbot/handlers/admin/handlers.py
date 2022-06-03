@@ -1,25 +1,12 @@
-from datetime import timedelta  # (used in 'def stats')
-from django.utils.timezone import now  # (used in 'def stats')
-
-from telegram import ParseMode, Update  # (parse_mode used in 'def stats')
+from telegram import Update  # (parse_mode used in 'def stats')
 from telegram.ext import CallbackContext, ConversationHandler
 
 from tgbot.handlers.admin import static_text
 from tgbot.handlers.admin.keyboards import feedback_buttons, strategy_buttons, stock_buttons, time_button, buy_button
-from tgbot.handlers.admin.utils import _get_csv_from_qs_values  # (used in 'def export_users')
 from tgbot.models import User, Strategy
-from tgbot.handlers.onboarding.handlers import invest_signal  # (used in 'def strategy')
 
 ASK_FOR_FEEDBACK_STATE, GET_FEEDBACK_STATE = range(2)
-
-# TODO удалим ли эту функцию?
-#def admin(update: Update, context: CallbackContext) -> None:
-#    """ Show help info about all secret admins commands """
-#    u = User.get_user(update, context)
-#    if not u.is_admin:
-#        update.message.reply_text(static_text.only_for_admins)
-#        return
-#    update.message.reply_text(static_text.secret_admin_commands)
+CALL_FOR_CATCH = False
 
 
 def str_info(update: Update, context: CallbackContext) -> None:
@@ -54,12 +41,12 @@ def feedback(update: Update, context: CallbackContext) -> int:
     """ feedback """
     u = User.get_user(update, context)
     buttons = update.message.reply_text(text=static_text.ask_feedback, reply_markup=feedback_buttons())
-
     return ASK_FOR_FEEDBACK_STATE
 
 
 def positive_feedback(update: Update, _) -> int:
     """ Handle thumbs up button then end conversation """
+    print('positive')
     query = update.callback_query
     query.answer()
 
@@ -70,6 +57,7 @@ def positive_feedback(update: Update, _) -> int:
 
 def negative_feedback(update: Update, _) -> int:
     """ Handle thumbs down button then ask to write the reason """
+    print('negative')
     query = update.callback_query
     query.answer()
 
@@ -80,6 +68,7 @@ def negative_feedback(update: Update, _) -> int:
 
 def ask_for_feedback(update: Update, _) -> int:
     """ Handle third button then wait feedback """
+    print('full answer')
     query = update.callback_query
     query.answer()
 
@@ -90,8 +79,7 @@ def ask_for_feedback(update: Update, _) -> int:
 
 def get_feedback(update: Update, _) -> int:
     """ Collect text then end conversation """
-    update.message.reply_text(f"Юля, с днём рождения! Мы тебя любим и очень-очень ценим <3 А вот и твой сюрприз: https://disk.yandex.ru/i/YSgy2SF-sALQjw")  # Спасибо за ваш отзыв! Мы успешно получили ваше сообщение: '{update.message.text}'
-
+    update.message.reply_text(f"Спасибо за ваш отзыв! Мы успешно получили ваше сообщение: '{update.message.text}'")
     return ConversationHandler.END
 
 
@@ -101,10 +89,12 @@ def cancel_feedback(update: Update, _) -> int:
 
     return ConversationHandler.END
 
+
 # TODO: разбить на разные обработчики
 def button(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     query.answer()
+    global CALL_FOR_CATCH
 
     # This will define which button the user tapped on
     # (from what you assigned to "callback_data". As I assigned them "1" and "2"):
@@ -121,7 +111,6 @@ def button(update: Update, context: CallbackContext) -> None:
         update.callback_query.message.reply_html(static_text.df_text_signals_rsi.loc[3].text[0],
                                                  reply_markup=buy_button())
         u, created = Strategy.get_strategy_and_created(update, context)
-        print(context)
         # TODO: add data to db
 
     elif choice == 'sma':
@@ -132,8 +121,9 @@ def button(update: Update, context: CallbackContext) -> None:
                                                  reply_markup=buy_button())
         update.callback_query.message.reply_html(static_text.df_text_signals_sma.loc[3].text[0],
                                                  reply_markup=buy_button())
-        u, created = Strategy.get_strategy_and_created(update, context)
-        print(context)
+
+        # u, created = Strategy.get_strategy_and_created(update, context)
+        Strategy.get_strategy_and_created(update, context)
         # TODO: add data to db
 
     elif choice == 'NASDAQ-100':
@@ -151,6 +141,21 @@ def button(update: Update, context: CallbackContext) -> None:
     elif choice == 'time_unlimited':
         update.callback_query.message.edit_text(static_text.time_settings_unlimited)
         # TODO: add data to db
+
+    elif choice == 'positive_answer':
+        print('choice positive')
+        update.callback_query.message.edit_text(static_text.positive_answer)
+
+    elif choice == 'negative_answer':
+        print('choice negative')
+        update.callback_query.message.edit_text(static_text.negative_answer)
+        CALL_FOR_CATCH = True
+
+
+    elif choice == 'ask_for_feedback':
+        print('choice ask for feedback')
+        update.callback_query.message.edit_text(static_text.feedback_text)
+        CALL_FOR_CATCH = True
 
 
 def off(update: Update, context: CallbackContext) -> None:
@@ -170,33 +175,10 @@ def off(update: Update, context: CallbackContext) -> None:
 
     # TODO filter signals to zero for user and add to db
 
-# TODO удалим ли эту функцию?
-#def stats(update: Update, context: CallbackContext) -> None:
-#    """ Show help info about all secret admins commands """
-#    u = User.get_user(update, context)
-#    if not u.is_admin:
-#        update.message.reply_text(static_text.only_for_admins)
-#        return
-#
-#    text = static_text.users_amount_stat.format(
-#        user_count=User.objects.count(),  # count may be ineffective if there are a lot of users.
-#        active_24=User.objects.filter(updated_at__gte=now() - timedelta(hours=24)).count()
-#    )
-#
-#    update.message.reply_text(
-#        text,
-#        parse_mode=ParseMode.HTML,
-#        disable_web_page_preview=True,
-#    )
 
-# TODO удалим ли эту функцию?
-#def export_users(update: Update, context: CallbackContext) -> None:
-#    u = User.get_user(update, context)
-#    if not u.is_admin:
-#        update.message.reply_text(static_text.only_for_admins)
-#        return
-#
-#    # in values argument you can specify which fields should be returned in output csv
-#    users = User.objects.all().values()
-#    csv_users = _get_csv_from_qs_values(users)
-#    context.bot.send_document(chat_id=u.user_id, document=csv_users)
+def reply_feedback(update: Update, context: CallbackContext) -> None:
+    # TODO ловим текст здесь
+    global CALL_FOR_CATCH
+    if CALL_FOR_CATCH:
+        print(update.message.text)
+        CALL_FOR_CATCH = False

@@ -10,14 +10,14 @@ from telegram import Bot, Update, BotCommand
 from telegram.ext import (
     Updater, Dispatcher, Filters,
     CommandHandler, MessageHandler,
-    CallbackQueryHandler,
-    ConversationHandler
+    CallbackQueryHandler
 )
 
 from dtb.celery import app  # event processing in async mode
 from dtb.settings import TELEGRAM_TOKEN, DEBUG
 from tgbot.handlers.admin import handlers as admin_handlers
-from tgbot.handlers.admin.handlers import ASK_FOR_FEEDBACK_STATE, GET_FEEDBACK_STATE
+from tgbot.handlers.admin.handlers import button, reply_feedback
+# from tgbot.handlers.admin.handlers import ASK_FOR_FEEDBACK_STATE, GET_FEEDBACK_STATE
 from tgbot.handlers.broadcast_message import handlers as broadcast_handlers
 from tgbot.handlers.broadcast_message.manage_data import CONFIRM_DECLINE_BROADCAST
 from tgbot.handlers.broadcast_message.static_text import broadcast_command
@@ -37,6 +37,7 @@ def setup_dispatcher(dp):
     dp.add_handler(CommandHandler("stock", admin_handlers.stock))
     dp.add_handler(CommandHandler("time", admin_handlers.time))
     dp.add_handler(CommandHandler("off", admin_handlers.off))
+    dp.add_handler(CommandHandler("feedback", admin_handlers.feedback))
 
     # broadcast message
     dp.add_handler(
@@ -56,7 +57,10 @@ def setup_dispatcher(dp):
     dp.add_error_handler(error.send_stacktrace_to_tg_chat)
 
     # TODO: обратите внимание - здесь сбор сообщений из чата
-    dp.add_handler(
+    dp.add_handler(CallbackQueryHandler(button))
+    dp.add_handler(MessageHandler(Filters.text, reply_feedback))
+
+    '''dp.add_handler(
         ConversationHandler(entry_points=[CommandHandler("feedback", admin_handlers.feedback)],
                             states={
                                 ASK_FOR_FEEDBACK_STATE: [
@@ -68,6 +72,7 @@ def setup_dispatcher(dp):
                                     MessageHandler(Filters.text & ~Filters.command, admin_handlers.get_feedback)]},
                             fallbacks=[CommandHandler('cancel', admin_handlers.cancel_feedback)])
     )
+    '''
 
     # TODO: обратите внимание - здесь глобальный обработчик кнопок, который не даёт работать фидбеку
     # dp.add_handler(CallbackQueryHandler(admin_handlers.button))

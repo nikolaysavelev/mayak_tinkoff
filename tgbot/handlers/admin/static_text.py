@@ -31,7 +31,6 @@ for i in range(-1, -4, -1):
     url_sma = f'http://www.tinkoff.ru/invest/stocks/{ticker_sma}?utm_source=mayak_bot&utm_content={user_id}'
     df_text_signals_sma.loc[-i] = [signal_text_sma, buy_button_text_sma, url_sma]  # TODO изменить индексирование DF
 
-
 # Цикл формирования текста последних трех сигналов RSI
 # Текст хранится в df_text_signals_rsi # TODO объединить 2 цикла в одну функцию обработчика нескольких CSV?
 for i in range(-1, -4, -1):
