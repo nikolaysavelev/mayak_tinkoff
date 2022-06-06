@@ -1,6 +1,4 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-#from tgbot.handlers.admin.static_text import url  TODO исправить импорт
-from tgbot.handlers.admin.static_text import ticker_sma
 
 
 def feedback_buttons() -> InlineKeyboardMarkup:
@@ -35,8 +33,9 @@ def time_button() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(buttons)
 
 
-def buy_button():  # TODO можем ли объединить 3 функции в одну?
-    user_id = 1  # TODO исрпавить
-    buttons = [[InlineKeyboardButton('Купить', callback_data='buy_share', url=f'http://www.tinkoff.ru/invest/stocks/{ticker_sma}?utm_source=mayak_bot&utm_content={user_id}')]]
+def buy_button(user_id, ticker):
+    url = f'http://www.tinkoff.ru/invest/stocks/{ticker}?utm_source=mayak_bot&utm_content={user_id}'
+    buttons = [[InlineKeyboardButton('Купить', callback_data=f'buy_share', url=url)]]
+    # TODO callback_data нужно добавить user_id и ticker?
 
     return InlineKeyboardMarkup(buttons)

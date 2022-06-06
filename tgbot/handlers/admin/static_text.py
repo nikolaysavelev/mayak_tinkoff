@@ -1,61 +1,46 @@
 import pandas as pd
 
-df_texts = pd.read_csv('static_texts.csv', sep=';')
-df_signals_sma = pd.read_csv('historic_signals_rsi.csv', sep=';')
-df_signals_rsi = pd.read_csv('historic_signals_sma.csv', sep=';')
-df_text_signals_sma = pd.DataFrame(columns=['text', 'button_text', 'url'])
-df_text_signals_rsi = pd.DataFrame(columns=['text', 'button_text', 'url'])
+df_texts = pd.read_csv('static_texts.csv', sep=',')
 
-# Цикл формирования текста последних трех сигналов SMA
-# Текст хранится в df_text_signals_sma
-for i in range(-1, -4, -1):
-    if df_signals_sma.iloc[i].buy_flag == 1:
-        action_sma = "🟢 BUY"
-        action_sma_2 = '↗'
-    else:
-        action_sma = "🔴 SELL"
-        action_sma_2 = '↘'
-    ticker_sma = df_signals_sma.iloc[i].ticker
-    last_price_sma = df_signals_sma.iloc[i].last_price
-    date_sma = df_signals_sma.iloc[i].datetime
-    currency_sma = df_signals_sma.iloc[i].currency
-    share_name_sma = df_signals_sma.iloc[i].name
-    investments_text_sma = f"Купить <b>{ticker_sma}</b> по <b>{last_price_sma} {currency_sma}<b> в Тинькофф Инвестициях"
-    signal_text_sma = f"{action_sma}\n" \
-                      f"{share_name_sma} (${ticker_sma}) {last_price_sma} {currency_sma}\n" \
-                      f"{action_sma_2} CROSS-SMA\n" \
-                      f"🕓{date_sma}"  # TODO заменить месяц на МАЙ вместо 05? Добавить время сигнала,
-    # TODO добавить доходность
-    buy_button_text_sma = f"Купить <b>{ticker_sma}</b> по <b>{last_price_sma} {currency_sma}<b> в Тинькофф Инвестициях"
-    user_id = 1  # TODO исрпавить
-    url_sma = f'http://www.tinkoff.ru/invest/stocks/{ticker_sma}?utm_source=mayak_bot&utm_content={user_id}'
-    df_text_signals_sma.loc[-i] = [signal_text_sma, buy_button_text_sma, url_sma]  # TODO изменить индексирование DF
 
-# Цикл формирования текста последних трех сигналов RSI
-# Текст хранится в df_text_signals_rsi # TODO объединить 2 цикла в одну функцию обработчика нескольких CSV?
-for i in range(-1, -4, -1):
-    if df_signals_rsi.iloc[i].buy_flag == 1:
-        action_rsi = '🟢 BUY'
-        action_rsi_2 = '📍RSI достиг нижнего уровня'
-    else:
-        action_rsi = '🔴 SELL'
-        action_rsi_2 = '📍RSI достиг верхнего уровня'
-    ticker_rsi = df_signals_rsi.iloc[i].ticker
-    last_price_rsi = df_signals_rsi.iloc[i].last_price
-    date_rsi = df_signals_rsi.iloc[i].datetime
-    currency_rsi = 'USD'  # TODO currency_rsi = df_signals_rsi.iloc[i].currency
-    share_name_rsi = df_signals_rsi.iloc[i].name
+def signal_pars(df_signals):
+    # парсит сигналы из DataFrame, который подаётся на вход.
+    # создаёт html для оптравки пользователю
+    # сохраняет html в DF
 
-    investments_text_rsi = f"Купить <b>{ticker_rsi}</b> по <b>{last_price_rsi} {currency_rsi}<b> в Тинькофф Инвестициях"
-    signal_text_rsi = f"{action_rsi}\n" \
-                      f"{share_name_rsi} (${ticker_rsi}) {last_price_rsi} {currency_rsi}\n" \
-                      f"{action_rsi_2}\n" \
-                      f"🕓{date_rsi}"  # TODO заменить месяц на МАЙ вместо 05? Добавить время сигнала,
-    # TODO добавить доходность
-    buy_button_text_rsi = f"Купить <b>{ticker_rsi}</b> по <b>{last_price_rsi} {currency_rsi}<b> в Тинькофф Инвестициях"
-    user_id = 1  # TODO исрпавить
-    url_rsi = f'http://www.tinkoff.ru/invest/stocks/{ticker_rsi}?utm_source=mayak_bot&utm_content={user_id}'
-    df_text_signals_rsi.loc[-i] = [signal_text_rsi, buy_button_text_rsi, url_rsi]
+    df_text_signals = pd.DataFrame(columns=['text', 'button_text', 'ticker'])
+
+    for i in range(-1, -4, -1):
+        if df_signals.iloc[i].buy_flag == 1 and df_signals.iloc[i].strategy_id == 'sma':
+            action = df_texts.signal[1]
+            action_2 = df_texts.signal[5]
+        elif df_signals.iloc[i].strategy_id == 'sma':
+            action = df_texts.signal[0]
+            action_2 = df_texts.signal[4]
+        elif df_signals.iloc[i].buy_flag == 1 and df_signals.iloc[i].strategy_id == 'rsi':
+            action = df_texts.signal[1]
+            action_2 = df_texts.signal[2]
+        else:
+            action = df_texts.signal[0]
+            action_2 = df_texts.signal[3]
+
+        ticker = df_signals.iloc[i].ticker
+        last_price = df_signals.iloc[i].last_price
+        date = df_signals.iloc[i].datetime
+        currency = df_signals.iloc[i].currency
+        share_name = df_signals.iloc[i].share_name
+
+        signal_text = f"{action}\n" \
+                      f"{share_name} (${ticker}) {last_price} {currency}\n" \
+                      f"{action_2}\n" \
+                      f"🕓{date}"  # TODO заменить месяц на МАЙ вместо 05? Добавить время сигнала,
+        # TODO добавить доходность
+        buy_button_text = f"Купить <b>{ticker}</b> по <b>{last_price} {currency}<b> в Тинькофф Инвестициях"
+
+        df_text_signals.loc[-i] = [signal_text, buy_button_text, ticker]
+
+    return df_text_signals
+
 
 sma_strategy_link = df_texts.str_info[0]
 rsi_strategy_link = df_texts.str_info[1]

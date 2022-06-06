@@ -4,6 +4,9 @@ from telegram.ext import CallbackContext, ConversationHandler
 from tgbot.handlers.admin import static_text
 from tgbot.handlers.admin.keyboards import feedback_buttons, strategy_buttons, stock_buttons, time_button, buy_button
 from tgbot.models import User, Strategy
+from tgbot.handlers.admin.static_text import signal_pars
+from pandas import read_csv
+from time import sleep
 
 ASK_FOR_FEEDBACK_STATE, GET_FEEDBACK_STATE = range(2)
 CALL_FOR_CATCH = False
@@ -34,7 +37,7 @@ def time(update: Update, context: CallbackContext) -> None:
     """ Edit time for user """
     u = User.get_user(update, context)
     buttons = update.message.reply_text(text=static_text.time_settings, reply_markup=time_button())
-    #TODO не забыть включить обработку текста
+    # TODO не забыть включить обработку текста
     # TODO edit time for user and add to db
 
 
@@ -105,23 +108,27 @@ def button(update: Update, context: CallbackContext) -> None:
 
     if choice == 'rsi':
         update.callback_query.message.reply_html(static_text.rsi_chosen)
-        update.callback_query.message.reply_html(static_text.df_text_signals_rsi.text[1],
-                                                 reply_markup=buy_button())
-        update.callback_query.message.reply_html(static_text.df_text_signals_rsi.text[2],
-                                                 reply_markup=buy_button())
-        update.callback_query.message.reply_html(static_text.df_text_signals_rsi.text[3],
-                                                 reply_markup=buy_button())
+
+        u = 1
+        df = read_csv('historic_signals_rsi.csv', sep=';')
+
+        sleep(7)
+        for i in range(1, 4):
+            update.callback_query.message.reply_html(signal_pars(df).text[i],
+                                                     reply_markup=buy_button(u, signal_pars(df).ticker[i]))
         # u, created = Strategy.get_strategy_and_created(update, context)
         # TODO: add data to db
 
     elif choice == 'sma':
         update.callback_query.message.reply_html(static_text.sma_chosen)
-        update.callback_query.message.reply_html(static_text.df_text_signals_sma.text[1],
-                                                 reply_markup=buy_button())
-        update.callback_query.message.reply_html(static_text.df_text_signals_sma.text[2],
-                                                 reply_markup=buy_button())
-        update.callback_query.message.reply_html(static_text.df_text_signals_sma.text[3],
-                                                 reply_markup=buy_button())
+
+        u = 1
+        df = read_csv('historic_signals_sma.csv', sep=';')
+
+        sleep(7)
+        for i in range(1, 4):
+            update.callback_query.message.reply_html(signal_pars(df).text[i],
+                                                     reply_markup=buy_button(u, signal_pars(df).ticker[i]))
 
         # u, created = Strategy.get_strategy_and_created(update, context)
         Strategy.get_strategy_and_created(update, context)
@@ -151,7 +158,6 @@ def button(update: Update, context: CallbackContext) -> None:
         print('choice negative')
         update.callback_query.message.edit_text(static_text.negative_answer)
         CALL_FOR_CATCH = True
-
 
     elif choice == 'ask_for_feedback':
         print('choice ask for feedback')
@@ -184,3 +190,5 @@ def reply_feedback(update: Update, context: CallbackContext) -> None:
         print(update.message.text)
         CALL_FOR_CATCH = False
         update.message.reply_text(static_text.final_answer)
+
+
