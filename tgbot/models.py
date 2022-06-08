@@ -24,6 +24,7 @@ class User(CreateUpdateTracker):
     last_name = models.CharField(max_length=256, **nb)
     language_code = models.CharField(max_length=8, help_text="Telegram client's lang", **nb)
     deep_link = models.CharField(max_length=64, **nb)
+    strategy_id = models.ForeignKey(Strategy, on_delete=models.CASCADE)
 
     strategy_id = models.BooleanField(default=False)
 
@@ -79,18 +80,11 @@ class User(CreateUpdateTracker):
         return f"{self.first_name} {self.last_name}" if self.last_name else f"{self.first_name}"
 
 
-class StrategyType(models.Model):
-    STRATEGIES = (
-        ('SMA', 'Средняя скользяшка'),
-        ('RSI', 'RSI'),
-    )
-    id = models.BigAutoField(primary_key=True)
-    strategy_name = models.CharField(max_length=10, choices=STRATEGIES)
-
-
 class Strategy(CreateUpdateTracker):
-    user_id = models.PositiveBigIntegerField(primary_key=True)
-    strategy_name = models.CharField(max_length=3, **nb)
+    strategy_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=30, **nb)
+    description = models.TextField()
+    ti_link = models.URLField()
 
     objects = GetOrNoneManager()
 
@@ -121,6 +115,27 @@ class Strategy(CreateUpdateTracker):
 
     def __str__(self):
         return "%s %s" % (self.user_id, self.strategy_name)
+
+class UserSignal():
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    signal_id = models.ForeignKey(Signal, on_delete=models.CASCADE)
+    status = models.BinaryField()
+
+class Stock():
+    stock_id = models.AutoField(primary_key=True)
+    ticker = models.CharField(max_length=10)
+    stock_name = models.CharField(max_length=100)
+    stock_group = models.BinaryField()
+
+
+class Signal():
+    signal_id = models.AutoField(primary_key=True)  # id сигнала
+    strategy_id = models.ForeignKey(Strategy, on_delete=models.CASCADE)
+    stock_id = models.ForeignKey(Stock, on_delete=models.CASCADE)
+    last_price = models.FloatField()
+    action_flag = models.BooleanField()
+    time_created = models.DateTimeField()
+    percent = models.FloatField()
 
 
 class Location(CreateTracker):
