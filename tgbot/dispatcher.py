@@ -119,6 +119,7 @@ def run_pooling():
 bot = Bot(TELEGRAM_TOKEN)
 try:
     TELEGRAM_BOT_USERNAME = bot.get_me()["username"]
+
 except telegram.error.Unauthorized:
     logging.error(f"Invalid TELEGRAM_TOKEN.")
     sys.exit(1)

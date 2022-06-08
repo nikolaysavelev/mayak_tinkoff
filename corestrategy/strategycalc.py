@@ -142,18 +142,18 @@ def calc_signal_sma(df_all_lasts, df_previous_sma_saving, n, df_signals):
 
             last_price = float(df_all_lasts.loc[figi].last_price)
             if n == 0:
-                previous_short_sma = (
-                        (historic_short_sma * (period_of_short_sma - 1) + last_price) / period_of_short_sma).round(3)
-                previous_long_sma = (
-                        (historic_long_sma * (period_of_long_sma - 1) + last_price) / period_of_long_sma).round(3)
+                previous_short_sma = round((
+                        (historic_short_sma * (period_of_short_sma - 1) + last_price) / period_of_short_sma), 3)
+                previous_long_sma = round((
+                        (historic_long_sma * (period_of_long_sma - 1) + last_price) / period_of_long_sma), 3)
                 df_previous_sma_saving.loc[figi] = [previous_short_sma, previous_long_sma]
 
             else:
 
-                actual_short_sma = (
-                        (historic_short_sma * (period_of_short_sma - 1) + last_price) / period_of_short_sma).round(3)
-                actual_long_sma = (
-                        (historic_long_sma * (period_of_long_sma - 1) + last_price) / period_of_long_sma).round(3)
+                actual_short_sma = round((
+                        (historic_short_sma * (period_of_short_sma - 1) + last_price) / period_of_short_sma), 3)
+                actual_long_sma = round((
+                        (historic_long_sma * (period_of_long_sma - 1) + last_price) / period_of_long_sma), 3)
                 df_previous_sma_saving.loc[figi] = [actual_short_sma,
                                                  actual_long_sma]  # актуальные сигналы становятся прошлыми
 
