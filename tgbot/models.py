@@ -25,12 +25,15 @@ class User(CreateUpdateTracker):
     language_code = models.CharField(max_length=8, help_text="Telegram client's lang", **nb)
     deep_link = models.CharField(max_length=64, **nb)
 
+    strategy_id = models.BooleanField(default=False)
+
     is_blocked_bot = models.BooleanField(default=False)
 
     is_admin = models.BooleanField(default=False)
 
     objects = GetOrNoneManager()  # user = User.objects.get_or_none(user_id=<some_id>)
     admins = AdminUserManager()  # User.admins.all()
+
 
     def __str__(self):
         return f'@{self.username}' if self.username is not None else f'{self.user_id}'
@@ -98,12 +101,20 @@ class Strategy(CreateUpdateTracker):
 
         data = extract_user_data_from_update(update)
         bata = {'strategy_name': update.callback_query.data}
+        print(bata)
         # TODO здесь все ломалось - пока зкомитила - обратите внимание
         u, created = cls.objects.update_or_create(user_id=data["user_id"],
                                                   defaults=bata)
+        if update.callback_query.data=='sma':
+            u.strategy_id = 0
+        else:
+            u.strategy_id = 1
+        u.save()
+        print(u)
 
         if created:
             print('hi DEBUG')
+
             #TODO написать функции фильтрации стратегий для рассыльщика
 
         return u, created

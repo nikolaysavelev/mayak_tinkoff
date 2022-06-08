@@ -43,8 +43,8 @@ def time(update: Update, context: CallbackContext) -> None:
 
 def feedback(update: Update, context: CallbackContext) -> int:
     """ feedback """
-    u = User.get_user(update, context)
     buttons = update.message.reply_text(text=static_text.ask_feedback, reply_markup=feedback_buttons())
+    u = User.get_user(update, context)
     return ASK_FOR_FEEDBACK_STATE
 
 
