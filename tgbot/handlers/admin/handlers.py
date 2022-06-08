@@ -132,6 +132,7 @@ def button(update: Update, context: CallbackContext) -> None:
 
         # u, created = Strategy.get_strategy_and_created(update, context)
         Strategy.get_strategy_and_created(update, context)
+
         # TODO: add data to db
 
     elif choice == 'NASDAQ-100':

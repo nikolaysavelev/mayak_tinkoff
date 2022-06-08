@@ -39,6 +39,7 @@ class User(CreateUpdateTracker):
     def get_user_and_created(cls, update: Update, context: CallbackContext) -> Tuple[User, bool]:
         """ python-telegram-bot's Update, Context --> User instance """
         data = extract_user_data_from_update(update)
+        print('data', data)
         u, created = cls.objects.update_or_create(user_id=data["user_id"], defaults=data)
 
         if created:
@@ -98,15 +99,14 @@ class Strategy(CreateUpdateTracker):
         data = extract_user_data_from_update(update)
         bata = {'strategy_name': update.callback_query.data}
         # TODO здесь все ломалось - пока зкомитила - обратите внимание
-        '''u, created = cls.objects.update_or_create(user_id=data["user_id"],
+        u, created = cls.objects.update_or_create(user_id=data["user_id"],
                                                   defaults=bata)
-        #print(created)
 
         if created:
             print('hi DEBUG')
             #TODO написать функции фильтрации стратегий для рассыльщика
 
-        return u, created'''
+        return u, created
 
     def __str__(self):
         return "%s %s" % (self.user_id, self.strategy_name)
