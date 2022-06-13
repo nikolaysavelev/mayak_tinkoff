@@ -5,7 +5,7 @@ from django.shortcuts import render
 from dtb.settings import DEBUG
 
 from tgbot.models import Location
-from tgbot.models import User, Strategy, StrategyType
+from tgbot.models import User, Strategy
 from tgbot.forms import BroadcastForm
 
 from tgbot.tasks import broadcast_message
@@ -59,7 +59,6 @@ class StrategyAdmin(admin.ModelAdmin):
     list_display = ['user_id', 'strategy_name']
 
 
-@admin.register(StrategyType)
-class StrategyTypeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'strategy_name']
-
+# @admin.register(StrategyType)
+# class StrategyTypeAdmin(admin.ModelAdmin):
+#    list_display = ['id', 'strategy_name']

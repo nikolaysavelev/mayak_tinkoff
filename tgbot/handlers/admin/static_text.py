@@ -1,6 +1,6 @@
 import pandas as pd
 
-df_texts = pd.read_csv('static_texts.csv', sep=',')
+df_texts = pd.read_csv('csv/static_texts.csv', sep=',')
 
 
 def signal_pars(df_signals):
@@ -54,17 +54,20 @@ add_new_strategy = df_texts.strategy[0]  # Сообщение при попыт�
 rsi_chosen = df_texts.menu[0]
 sma_chosen = df_texts.menu[1]
 
+# FEEDBACK
 ask_feedback = df_texts.feedback[0]
 feedback_text = df_texts.feedback[1]
 positive_answer = df_texts.feedback[2]
 negative_answer = df_texts.feedback[3]
 final_answer = df_texts.feedback[4]
 
+# INDEX CHOICE
 stock_choice = df_texts.stock_choice[0]
 nasdaq100_chosen = df_texts.stock_choice[3]
 sp500_chosen = df_texts.stock_choice[4]
 all_shares_chosen = df_texts.stock_choice[5]
 
+# TIME SETTING
 time_settings = df_texts.time[0]
 time_settings_unlimited = df_texts.time[1]
 

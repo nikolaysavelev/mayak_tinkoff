@@ -24,7 +24,7 @@ from tgbot.handlers.broadcast_message.static_text import broadcast_command
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
 from tgbot.handlers.utils import files, error
 from tgbot.handlers.admin.delivery_boy import run_delivery_boy
-from corestrategy.datadownload import run_download
+from corestrategy.datadownload import run_download_data
 from corestrategy.strategycalc import run_sma_strategy
 import threading
 
@@ -161,5 +161,5 @@ n_workers = 0 if DEBUG else 4
 dispatcher = setup_dispatcher(Dispatcher(bot, update_queue=None, workers=n_workers, use_context=True))
 
 thr1 = threading.Thread(target=run_delivery_boy).start()
-thr2 = threading.Thread(target=run_download).start()
+thr2 = threading.Thread(target=run_download_data).start()
 thr3 = threading.Thread(target=run_sma_strategy).start()

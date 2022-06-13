@@ -1,12 +1,14 @@
 import datetime as dt
 import os.path
+import threading
 import time
 from datetime import datetime
 
 import pandas as pd
 from tinkoff.invest import *
 
-from corestrategy.datadownload import token, df_all_figi, df_all_shares, period_of_short_sma, period_of_long_sma
+from corestrategy.datadownload import df_all_figi, df_all_shares, period_of_short_sma, period_of_long_sma, \
+    check_files_existing, token
 
 
 def get_shares_list_to_csv():
@@ -22,7 +24,7 @@ def get_shares_list_to_csv():
         df_shares = pd.DataFrame(all_shares.instruments)
         df_shares.set_index(['figi'], inplace=True)
         df_figi = df_shares.index  # для подачи на выход функции массива всех figi
-        df_shares.to_csv('shares.csv', sep=';')  # выгружает dataframe в CSV
+        df_shares.to_csv('csv/shares.csv', sep=';')  # выгружает dataframe в CSV
         print('✅Downloaded list of shares')
 
     except Exception as e:
@@ -68,7 +70,7 @@ def sma_cross(actual_short_sma,
     previous_short_sma_2 = df_previous_sma_saving.loc[figi].previous_short_sma
     previous_long_sma_2 = df_previous_sma_saving.loc[figi].previous_long_sma
 
-    # математическая проверка на совпадение с условиями сигнала
+    # проверка на совпадение с условиями сигнала
     crossing_buy = ((actual_short_sma > actual_long_sma) & (previous_short_sma_2 < previous_long_sma_2) & (
             last_price > actual_long_sma))
     crossing_sell = ((actual_short_sma < actual_long_sma) & (previous_short_sma_2 > previous_long_sma_2) & (
@@ -78,18 +80,42 @@ def sma_cross(actual_short_sma,
 
     # если условие выполняется, то записываем данные в CSV
     if crossing_sell and df_signals.loc[figi].sell_flag != 1:
-        df_one_signal = pd.DataFrame([[figi, ticker, datetime.now(), last_price, 1, 0, 'SMA']],
-                                     columns=['figi',
-                                              'ticker',
-                                              'datetime',
-                                              'last_price',
-                                              'sell_flag',
-                                              'buy_flag',
-                                              'strategy_id'])
+        buy_flag = 1
+        sell_flag = 0
+        profit = 0  # TODO profit
+        ticker = df_all_shares.ticker[x]
+        share_name = df_all_shares.name[x]
+        currency = df_all_shares.currency[x]
+        df_one_signal = pd.DataFrame([[figi,
+                                       ticker,
+                                       share_name,
+                                       datetime.utcnow(),
+                                       last_price,
+                                       sell_flag,
+                                       buy_flag,
+                                       'sma',
+                                       profit,
+                                       currency]],
+                              columns=['figi',
+                                       'ticker',
+                                       'datetime',
+                                       'last_price',
+                                       'sell_flag',
+                                       'buy_flag',
+                                       'strategy_id'])
         df_one_signal.set_index('figi')
-        df_signals.append(df_one_signal)  # TODO изменить на concat + test
+        df_signals.append(df_one_signal)  # TODO изменить на concat + test (или loc)
     if crossing_buy and df_signals.loc[figi].buy_flag != 1:
-        df_one_signal = pd.DataFrame([[figi, ticker, datetime.now(), last_price, 0, 1, 'SMA']],
+        df_one_signal = pd.DataFrame([[figi,
+                                       ticker,
+                                       share_name,
+                                       datetime.utcnow(),
+                                       last_price,
+                                       sell_flag,
+                                       buy_flag,
+                                       'sma',
+                                       profit,
+                                       currency]],
                                      columns=['figi',
                                               'ticker'
                                               'datetime',
@@ -98,7 +124,7 @@ def sma_cross(actual_short_sma,
                                               'buy_flag',
                                               'strategy_id'])
         df_one_signal.set_index('figi')
-        df_signals.append(df_one_signal)  # TODO изменить на concat + test
+        df_signals.append(df_one_signal)  # TODO изменить на concat + test (или loc)
 
 
 def calc_signal_sma(df_all_lasts, df_previous_sma_saving, n, df_signals):
@@ -108,7 +134,7 @@ def calc_signal_sma(df_all_lasts, df_previous_sma_saving, n, df_signals):
     # На выходе актуальные SMA_short, SMA_long, а также SMA_short, SMA_long за минуту назад
     # вспомогательная функция для def calc_signals
 
-    df_all_historic_sma = pd.read_csv('sma.csv', sep=';', index_col=0)
+    df_all_historic_sma = pd.read_csv('csv/sma.csv', sep=';', index_col=0)
     for figi in df_all_historic_sma.columns[::2]:
 
         # ниже получаем данные о исторических SMA из CSV
@@ -155,7 +181,7 @@ def calc_signal_sma(df_all_lasts, df_previous_sma_saving, n, df_signals):
                 actual_long_sma = round((
                         (historic_long_sma * (period_of_long_sma - 1) + last_price) / period_of_long_sma), 3)
                 df_previous_sma_saving.loc[figi] = [actual_short_sma,
-                                                 actual_long_sma]  # актуальные сигналы становятся прошлыми
+                                                    actual_long_sma]  # актуальные сигналы становятся прошлыми
 
                 sma_cross(actual_short_sma, actual_long_sma, df_previous_sma_saving, figi, last_price, df_signals)
 
@@ -165,23 +191,37 @@ def calc_and_save_actual_signals_sma(n):
 
     df_previous_sma_saving = pd.DataFrame(index=df_all_figi, columns=['previous_short_sma', 'previous_long_sma'])
     df_all_lasts = get_all_lasts()
-    if not os.path.exists('Actual_signals_SMA.csv'):  # TODO тест переноса из цикла наружу
-        df_signals = pd.DataFrame(columns=['figi', "datetime", 'last_price', 'sell_flag', 'buy_flag', 'strategy_id'])
+    if not os.path.exists('csv/actual_signals_sma.csv'):  # TODO тест переноса из цикла наружу
+        df_signals = pd.DataFrame(columns=['figi',
+                                           'ticker',
+                                           'share_name',
+                                           'datetime',
+                                           'last_price',
+                                           'sell_flag',
+                                           'buy_flag',
+                                           'strategy_id',
+                                           'profit',
+                                           'currency'])
         df_signals.set_index('figi')
     else:
-        df_signals = pd.read_csv('Actual_signals_SMA.csv', sep=';', index_col=0)
+        df_signals = pd.read_csv('csv/actual_signals_sma.csv', sep=';', index_col=0)
     calc_signal_sma(df_all_lasts, df_previous_sma_saving, n, df_signals)
-    df_signals.to_csv('Actual_signals_SMA.csv', sep=';')
+    df_signals.to_csv('csv/actual_signals_sma.csv', sep=';')
     time.sleep(60)
 
 
 def run_sma_strategy():
-    while True:
-        n = 0  # TODO refactor
-        if dt.time(hour=4) < datetime.now().time() < dt.time(hour=23):  # время по UTC+0 TODO UTC+3 (docker-настройки)
-            print('SMA_strategy_calc_starts')
-            calc_and_save_actual_signals_sma(n)
-            n += 1  # TODO refactor
-        else:
-            n = 0  # TODO refactor
-            time.sleep(300)
+    n = 0  # TODO refactor
+    if check_files_existing():
+        while True:
+            mod_date = datetime.utcnow() - pd.to_datetime(os.stat('csv/historic_signals_rsi.csv').st_mtime_ns)
+            if (not dt.time(hour=3) < datetime.now().time() < dt.time(hour=6)) and \
+                    (not mod_date > dt.timedelta(hours=25)):
+                print('SMA_strategy_calc_starts')
+                calc_and_save_actual_signals_sma(n)
+                n += 1  # TODO refactor
+            else:
+                n = 0  # TODO refactor
+                threading.Event().wait(300)
+    else:
+        threading.Event().wait(3600)
