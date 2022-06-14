@@ -102,19 +102,20 @@ def one_figi_all_candles_request(figi, days, df_fin_volumes, df_fin_close_prices
                 from_=datetime.utcnow() - timedelta(days=days),  # период времени определяется динамически функцией last_data_parser
                 interval=CandleInterval.CANDLE_INTERVAL_DAY,  # запрашиваемая размерность японских свеч (дневная)
         ):
-            data = dt.datetime(candle.time.year, candle.time.month, candle.time.day)  # из ответа API парсит дату
-            close_price = f'{candle.close.units}.{candle.close.nano // 10000000}'  # из ответа API парс. цену закрытия
-            volume = candle.volume  # из ответа API парсит объём торгов
+            if candle.is_complete:
+                data = dt.datetime(candle.time.year, candle.time.month, candle.time.day)  # из ответа API парсит дату
+                close_price = f'{candle.close.units}.{candle.close.nano // 10000000}'  # из ответа API парс. цену закрытия
+                volume = candle.volume  # из ответа API парсит объём торгов
 
-            # print('Цена открытия:', candle.open.units, '.', candle.open.nano // 10000000, sep='')
-            # print('Цена закрытия:', candle.close.units, '.', candle.close.nano // 10000000, sep='')
-            # print('Макс. цена:', candle.high.units, '.', candle.high.nano // 10000000, sep='')
-            # print('Мин. цена:', candle.low.units, '.', candle.low.nano // 10000000, sep='')
-            # print('Объём:', candle.volume, 'сделок')
-            # print('')
+                # print('Цена открытия:', candle.open.units, '.', candle.open.nano // 10000000, sep='')
+                # print('Цена закрытия:', candle.close.units, '.', candle.close.nano // 10000000, sep='')
+                # print('Макс. цена:', candle.high.units, '.', candle.high.nano // 10000000, sep='')
+                # print('Мин. цена:', candle.low.units, '.', candle.low.nano // 10000000, sep='')
+                # print('Объём:', candle.volume, 'сделок')
+                # print('')
 
-            df_fin_close_prices.at[data, figi] = close_price  # если данных нет, записывает новые
-            df_fin_volumes.at[data, figi] = volume  # если данных нет, записывает новые
+                df_fin_close_prices.at[data, figi] = close_price  # если данных нет, записывает новые
+                df_fin_volumes.at[data, figi] = volume  # если данных нет, записывает новые
 
 
 def create_2_csv_with_historic_candles():
@@ -319,8 +320,6 @@ def calc_historic_signals_sma():
     # функция позволяет циклически считать сигналы на основе постоянно обновляющихся last_prices
 
     df_fin_close_prices = pd.read_csv('csv/historic_close_prices.csv', sep=';', index_col=0, parse_dates=[0])
-    # df_previous_sma_saving = pd.DataFrame(index=df_all_figi, columns=['previous_short_sma', 'previous_long_sma'])
-    # TODO удалить? test
     df_all_historic_sma = pd.read_csv('csv/sma.csv', sep=';', index_col=0)
     df_amount_of_sma = pd.read_csv('csv/amount_sma.csv', sep=';', index_col=0, parse_dates=[0])
     df_historic_signals_sma = pd.DataFrame(columns=['figi',
@@ -391,8 +390,8 @@ def calc_profit():
 
 
 def calc_historic_rsi_signals():
-    # Функция позволяет рассчитать RSI и сигналы на основе индикатора примерно ниже 30% и выше 70%.
-    # На вход подаются исторические цены
+    '''Функция позволяет рассчитать индикатор RSI и сигналы на основе индикатора.
+    Триггером являются показатели RSI ниже 30% и выше 70% (примерно)'''
 
     df_fin_close_prices = pd.read_csv('csv/historic_close_prices.csv', sep=';', parse_dates=[0], index_col=0)
     df_historic_signals_rsi = pd.DataFrame(columns=['figi',
@@ -415,13 +414,13 @@ def calc_historic_rsi_signals():
     ema_down = down.ewm(com=14, adjust=False).mean()  # 14 - значение для экспоненциальной скользяшки (дней)
     rs = ema_up / ema_down
     rsi = (100 - (100 / (1 + rs))).round(2)
-    rsi.to_csv('csv/historic_rsi_data.csv', sep=';')  # TODO допилить расчет только недостающих данных, а не всех сразу
+    rsi.to_csv('csv/historic_rsi_data.csv', sep=';')
 
     for x in tqdm(range(len(df_all_figi)), desc='Calculating_historic_rsi_signals'):
         figi = df_all_figi[x]
         upper_rsi = np.nanpercentile(rsi[figi], 95)  # верхняя граница RSI, значение 95 отсеивает RSI примерно выше 70
         lower_rsi = np.nanpercentile(rsi[figi], 2.5)  # нижняя граница RSI, значение 2.5 отсеивает RSI примерно ниже 30
-        for y in range(len(rsi[figi])):  # проверка DF rsi на условие upper_rsi, lower_rsi
+        for y in range(len(rsi[figi])):  # цикл проверки DF rsi на условие upper_rsi, lower_rsi
             rsi_float = rsi[figi][y]
             date = rsi.index[y]
             last_price = df_fin_close_prices[figi][date]
@@ -489,19 +488,15 @@ def run_download_data():
         print('✅All data saving complete')
 
     while True:
-        mod_date = datetime.utcnow() - pd.to_datetime(os.stat('csv/historic_signals_rsi.csv').st_mtime_ns)
+        mod_date = datetime.utcnow() - pd.to_datetime(os.stat('csv/sma.csv').st_mtime_ns)
         if (dt.time(hour=3) < datetime.now().time() < dt.time(hour=6) and mod_date > dt.timedelta(hours=3)) or\
-           (mod_date > dt.timedelta(hours=25)):
+           (mod_date > dt.timedelta(hours=24)):
             print('START DATA DOWNLOADING')
             create_2_csv_with_historic_candles()
 
             # расчет исторических индикаторов
             calc_std()
             calc_sma()
-
-            # подготовка исторических сигналов
-            calc_historic_signals_sma()
-            calc_historic_rsi_signals()
 
             # подсчет исторических доходностей на основе сигналов
             calc_profit()
