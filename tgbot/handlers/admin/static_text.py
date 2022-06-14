@@ -62,14 +62,14 @@ negative_answer = df_texts.feedback[3]
 final_answer = df_texts.feedback[4]
 
 # INDEX CHOICE
-stock_choice = df_texts.stock_choice[0]
-nasdaq100_chosen = df_texts.stock_choice[3]
-sp500_chosen = df_texts.stock_choice[4]
-all_shares_chosen = df_texts.stock_choice[5]
+# stock_choice = df_texts.stock_choice[0]
+# nasdaq100_chosen = df_texts.stock_choice[3]
+# sp500_chosen = df_texts.stock_choice[4]
+# all_shares_chosen = df_texts.stock_choice[5]
 
 # TIME SETTING
-time_settings = df_texts.time[0]
-time_settings_unlimited = df_texts.time[1]
+# time_settings = df_texts.time[0]
+# time_settings_unlimited = df_texts.time[1]
 
 off_signals = df_texts.off_signals[0]
 

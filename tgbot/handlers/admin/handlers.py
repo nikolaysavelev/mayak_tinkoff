@@ -30,13 +30,13 @@ def strategy(update: Update, context: CallbackContext) -> None:
 def stock(update: Update, context: CallbackContext) -> None:
     """ Filter by stocks """
     # TODO filter stocks for user and add to db
-    buttons = update.message.reply_text(text=static_text.stock_choice, reply_markup=stock_buttons())
+    # buttons = update.message.reply_text(text=static_text.stock_choice, reply_markup=stock_buttons())
 
 
 def time(update: Update, context: CallbackContext) -> None:
     """ Edit time for user """
-    u = User.get_user(update, context)
-    buttons = update.message.reply_text(text=static_text.time_settings, reply_markup=time_button())
+    # u = User.get_user(update, context)
+    # buttons = update.message.reply_text(text=static_text.time_settings, reply_markup=time_button())
     # TODO не забыть включить обработку текста
     # TODO edit time for user and add to db
 
@@ -135,21 +135,21 @@ def button(update: Update, context: CallbackContext) -> None:
 
         # TODO: add data to db
 
-    elif choice == 'NASDAQ-100':
-        update.callback_query.message.edit_text(static_text.nasdaq100_chosen)
-        # TODO: add data to db
-
-    elif choice == 'S&P 500':
-        update.callback_query.message.edit_text(static_text.sp500_chosen)
-        # TODO: add data to db
-
-    elif choice == 'all_shares':
-        update.callback_query.message.edit_text(static_text.all_shares_chosen)
-        # TODO: add data to db
-
-    elif choice == 'time_unlimited':
-        update.callback_query.message.edit_text(static_text.time_settings_unlimited)
-        # TODO: add data to db
+    # elif choice == 'NASDAQ-100':
+    #     update.callback_query.message.edit_text(static_text.nasdaq100_chosen)
+    #     # TODO: add data to db
+    #
+    # elif choice == 'S&P 500':
+    #     update.callback_query.message.edit_text(static_text.sp500_chosen)
+    #     # TODO: add data to db
+    #
+    # elif choice == 'all_shares':
+    #     update.callback_query.message.edit_text(static_text.all_shares_chosen)
+    #     # TODO: add data to db
+    #
+    # elif choice == 'time_unlimited':
+    #     update.callback_query.message.edit_text(static_text.time_settings_unlimited)
+    #     # TODO: add data to db
 
     elif choice == 'positive_answer':
         print('choice positive')

@@ -38,8 +38,8 @@ def setup_dispatcher(dp):
 
     dp.add_handler(CommandHandler("strategy", admin_handlers.strategy))
     dp.add_handler(CommandHandler("str_info", admin_handlers.str_info))
-    dp.add_handler(CommandHandler("stock", admin_handlers.stock))
-    dp.add_handler(CommandHandler("time", admin_handlers.time))
+    # dp.add_handler(CommandHandler("stock", admin_handlers.stock))
+    # dp.add_handler(CommandHandler("time", admin_handlers.time))
     dp.add_handler(CommandHandler("off", admin_handlers.off))
     dp.add_handler(CommandHandler("feedback", admin_handlers.feedback))
 
