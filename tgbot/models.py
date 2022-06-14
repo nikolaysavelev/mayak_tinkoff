@@ -12,6 +12,43 @@ from tgbot.handlers.utils.info import extract_user_data_from_update
 from utils.models import CreateUpdateTracker, nb, CreateTracker, GetOrNoneManager
 
 
+class Strategy(CreateUpdateTracker):
+    strategy_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=30, **nb)
+    description = models.TextField()
+    ti_link = models.URLField()
+
+    objects = GetOrNoneManager()
+
+    @classmethod
+    def get_strategy_and_created(cls, update: Update, context: CallbackContext):  # -> Tuple[User, bool]:
+        """ python-telegram-bot's Update, Context --> User instance """
+        print('context', update.callback_query.data)
+
+        data = extract_user_data_from_update(update)
+        bata = {'strategy_name': update.callback_query.data}
+        print(bata)
+        # TODO здесь все ломалось - пока зкомитила - обратите внимание
+        u, created = cls.objects.update_or_create(user_id=data["user_id"],
+                                                  defaults=bata)
+        if update.callback_query.data == 'sma':
+            u.strategy_id = 0
+        else:
+            u.strategy_id = 1
+        u.save()
+        print(u)
+
+        if created:
+            print('hi DEBUG')
+
+            #TODO написать функции фильтрации стратегий для рассыльщика
+
+        return u, created
+
+    def __str__(self):
+        return "%s %s" % (self.user_id, self.strategy_name)
+
+
 class AdminUserManager(Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_admin=True)
@@ -34,7 +71,6 @@ class User(CreateUpdateTracker):
 
     objects = GetOrNoneManager()  # user = User.objects.get_or_none(user_id=<some_id>)
     admins = AdminUserManager()  # User.admins.all()
-
 
     def __str__(self):
         return f'@{self.username}' if self.username is not None else f'{self.user_id}'
@@ -80,55 +116,14 @@ class User(CreateUpdateTracker):
         return f"{self.first_name} {self.last_name}" if self.last_name else f"{self.first_name}"
 
 
-class Strategy(CreateUpdateTracker):
-    strategy_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=30, **nb)
-    description = models.TextField()
-    ti_link = models.URLField()
-
-    objects = GetOrNoneManager()
-
-    @classmethod
-    def get_strategy_and_created(cls, update: Update, context: CallbackContext):  # -> Tuple[User, bool]:
-        """ python-telegram-bot's Update, Context --> User instance """
-        print('context', update.callback_query.data)
-
-        data = extract_user_data_from_update(update)
-        bata = {'strategy_name': update.callback_query.data}
-        print(bata)
-        # TODO здесь все ломалось - пока зкомитила - обратите внимание
-        u, created = cls.objects.update_or_create(user_id=data["user_id"],
-                                                  defaults=bata)
-        if update.callback_query.data=='sma':
-            u.strategy_id = 0
-        else:
-            u.strategy_id = 1
-        u.save()
-        print(u)
-
-        if created:
-            print('hi DEBUG')
-
-            #TODO написать функции фильтрации стратегий для рассыльщика
-
-        return u, created
-
-    def __str__(self):
-        return "%s %s" % (self.user_id, self.strategy_name)
-
-class UserSignal():
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    signal_id = models.ForeignKey(Signal, on_delete=models.CASCADE)
-    status = models.BinaryField()
-
-class Stock():
+class Stock(models.Model):
     stock_id = models.AutoField(primary_key=True)
     ticker = models.CharField(max_length=10)
     stock_name = models.CharField(max_length=100)
     stock_group = models.BinaryField()
 
 
-class Signal():
+class Signal(models.Model):
     signal_id = models.AutoField(primary_key=True)  # id сигнала
     strategy_id = models.ForeignKey(Strategy, on_delete=models.CASCADE)
     stock_id = models.ForeignKey(Stock, on_delete=models.CASCADE)
@@ -136,6 +131,12 @@ class Signal():
     action_flag = models.BooleanField()
     time_created = models.DateTimeField()
     percent = models.FloatField()
+
+
+class UserSignal(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    signal_id = models.ForeignKey(Signal, on_delete=models.CASCADE)
+    status = models.BinaryField()
 
 
 class Location(CreateTracker):
